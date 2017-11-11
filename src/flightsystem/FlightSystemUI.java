@@ -402,27 +402,20 @@ public class FlightSystemUI extends javax.swing.JFrame {
         roundtripCheckBox.setEnabled(false);
         searchButton.setEnabled(false);
         //Get one way flight from departure -> arrival airport
+        getFlights();
+        roundtripCheckBox.setEnabled(true);
+        searchButton.setEnabled(true);
+        
+    }//GEN-LAST:event_searchButtonActionPerformed
+    private void getFlights()
+    {
         Flights depFlights = ServerInterface.INSTANCE.getFlights("CS509team1", departureCode, localTime, ServerInterface.QueryFlightType.DEPART, getFilter(arrivalCode));
         if (depFlights.size() > 0 )
         {
             flightSystemUILogger.log(Level.INFO, "Adding departure->arrival flights info to table");
             departureLabelOut.setText(departureCode);
             arrivalLabelOut.setText(arrivalCode);
-            DefaultTableModel model = new DefaultTableModel();
-            model.setColumnIdentifiers(new String [] {
-                "Flight #", "Departure", "Departure Tme", "Arrival", "Arrival Time", "Flight Time", "FirstClass $", "Coach $"
-            });
-            depFlights.forEach((f) -> {
-                model.addRow(new Object[]{ f.getmNumber(),
-                    f.getmDepAirport(),
-                    f.getmDepTime().toString(),
-                    f.getmArrAirport(),
-                    f.getmArrTime().toString(),
-                    f.getmFlightTime(),
-                    f.getmPriceFirst(),
-                    f.getmPriceCoach()});
-            });
-            departureTable.setModel(model);
+            addFlightToTable(depFlights, departureTable);
         }
         else
         {
@@ -441,21 +434,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
             flightSystemUILogger.log(Level.INFO, "Adding arrival flight info to table");
             departureLabelIn.setText(arrivalCode);
             arrivalLableIn.setText(departureCode);
-            DefaultTableModel model = new DefaultTableModel();
-            model.setColumnIdentifiers(new String [] {
-                "Flight #", "Departure", "Departure Tme", "Arrival", "Arrival Time", "Flight Time", "FirstClass $", "Coach $"
-            });
-            arrivalFlights.forEach((f) -> {
-                model.addRow(new Object[]{ f.getmNumber(),
-                    f.getmDepAirport(),
-                    f.getmDepTime().toString(),
-                    f.getmArrAirport(),
-                    f.getmArrTime().toString(),
-                    f.getmFlightTime(),
-                    f.getmPriceFirst(),
-                    f.getmPriceCoach()});
-                });
-            arrivalTable.setModel(model);
+            addFlightToTable(arrivalFlights, arrivalTable);
         }
         else
         {
@@ -465,11 +444,25 @@ public class FlightSystemUI extends javax.swing.JFrame {
                 JOptionPane.WARNING_MESSAGE);
         }
         }
-        roundtripCheckBox.setEnabled(true);
-        searchButton.setEnabled(true);
-        
-    }//GEN-LAST:event_searchButtonActionPerformed
-
+    }
+    private void addFlightToTable(Flights flights, javax.swing.JTable table)
+    {
+                 DefaultTableModel model = new DefaultTableModel();
+            model.setColumnIdentifiers(new String [] {
+                "Flight #", "Departure", "Departure Tme", "Arrival", "Arrival Time", "Flight Time", "FirstClass $", "Coach $"
+            });
+            flights.forEach((f) -> {
+                model.addRow(new Object[]{ f.getmNumber(),
+                    f.getmDepAirport(),
+                    f.getmDepTime().toString(),
+                    f.getmArrAirport(),
+                    f.getmArrTime().toString(),
+                    f.getmFlightTime(),
+                    f.getmPriceFirst(),
+                    f.getmPriceCoach()});
+                });
+            table.setModel(model);   
+    }
     private void roundtripCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roundtripCheckBoxActionPerformed
         // TODO add your handling code here:
         arrivalTable.setEnabled(roundtripCheckBox.isSelected());
