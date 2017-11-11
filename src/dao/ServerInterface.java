@@ -133,7 +133,6 @@ public enum ServerInterface {
                 String dateStr = searchDate.format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
 		url = new URL(mUrlBase + QueryFactory.getFlights(teamName, typeStr, 
                         airportCode, dateStr));
-                System.out.println("URL: "+ url.toString());
 		connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("User-Agent", teamName);
@@ -166,11 +165,9 @@ public enum ServerInterface {
                 return flights;
             } else {
                 Flights filteredFlight = new Flights();
-                for (Flight f: flights) {
-                    if (filter.isValid(f)) {
-                        filteredFlight.add(f);
-                    }
-                }
+                flights.stream().filter((f) -> (filter.isValid(f))).forEachOrdered((f) -> {
+                    filteredFlight.add(f);
+                });
                 return filteredFlight;
             }
         }

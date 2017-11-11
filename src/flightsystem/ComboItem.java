@@ -1,42 +1,44 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package flightsystem;
 
 /**
- *
+ * Class responsible for creating a ComboBox item
+ * ComboBox used to display available airport 
  * @author dg71532
  */
 public class ComboItem
 {
-    private String key;
-    private String value;
-
-    public ComboItem(String code, String airport)
+    private String airportCode;
+    private String airportName;
+    
+    /**
+     * Constructor
+     * @param code Aiport Code
+     * @param name Name of the aiport
+     */
+    public ComboItem(String code, String name)
     {
-        this.key = code;
-        this.value = airport;
+        this.airportCode = code;
+        this.airportName = name;
     }
 
     ComboItem() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
     public String toString()
     {
-        return key+"-"+value;
+        return airportCode+"-"+airportName;
+    }
+    
+    public String getAirportCode()
+    {
+        return airportCode;
     }
 
-    public String getKey()
+    public String getAirportName()
     {
-        return key;
-    }
-
-    public String getValue()
-    {
-        return value;
+        return airportName;
     }
 }

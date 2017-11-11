@@ -24,8 +24,9 @@ import org.xml.sax.SAXException;
 import java.util.logging.Logger;
 
 /**
- *
+ * Class responsible for parsing Flight XML and creating Flights object
  * @author alvin-arch
+ * 
  */
 public class DaoFlight {
     static private Logger flightLogger;
@@ -33,7 +34,12 @@ public class DaoFlight {
         flightLogger = Logger.getLogger(DaoFlight.class.getName());
         flightLogger.setLevel(Level.INFO);
     }
-    
+    /**
+     * Parses XML and generated Flight objects
+     * @param xmlFlights: xml from the server
+     * @return Flights object
+     * @throws NullPointerException 
+     */
     public static Flights addAll (String xmlFlights) throws NullPointerException {
         Flights flights = new Flights();
         Document docFlights = buildDomDoc(xmlFlights);
