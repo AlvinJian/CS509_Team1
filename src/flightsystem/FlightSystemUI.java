@@ -32,6 +32,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
     private LocalDateTime localTimeReturn = LocalDateTime.now();
     private String departureCode;
     private String arrivalCode;
+    private FlightInfoController flightInfoController;
     private static final Logger flightSystemUILogger;
     static {
         flightSystemUILogger = Logger.getLogger(DaoFlight.class.getName());
@@ -43,6 +44,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
     public FlightSystemUI() {
         //Initialize UI components
         initComponents();
+        flightInfoController = new FlightInfoController();
         dateTimePickerReturn.setEnabled(false);
         arrivalTable.setEnabled(false);
         departureComboBox.removeAllItems();
@@ -112,7 +114,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
     {
         flightSystemUILogger.log(Level.INFO, "Getting airports");
 	// Try to get a list of airports
-        Airports airports = ServerInterface.INSTANCE.getAirports("CS509team1");
+        Airports airports = flightInfoController.syncAirports();
 	Collections.sort(airports);
         airports.forEach((airport) -> {
             addAiportToComboBoxes(airport.code(), airport.name());
@@ -409,40 +411,46 @@ public class FlightSystemUI extends javax.swing.JFrame {
     }//GEN-LAST:event_searchButtonActionPerformed
     private void getFlights()
     {
-        Flights depFlights = ServerInterface.INSTANCE.getFlights("CS509team1", departureCode, localTime, ServerInterface.QueryFlightType.DEPART, getFilter(arrivalCode));
-        if (depFlights.size() > 0 )
-        {
-            flightSystemUILogger.log(Level.INFO, "Adding departure->arrival flights info to table");
-            departureLabelOut.setText(departureCode);
-            arrivalLabelOut.setText(arrivalCode);
-            addFlightToTable(depFlights, departureTable);
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(null,
-            "No flights available for this combination",
-            "Flight Availability Warning",
+        //Flights depFlights = ServerInterface.INSTANCE.getFlights("CS509team1", departureCode, localTime, ServerInterface.QueryFlightType.DEPART, getFilter(arrivalCode));
+        FlightInfoController.FlightsReceiver receiver = (Flights depFlights) -> {
+            if (depFlights.size() > 0 )
+            {
+                flightSystemUILogger.log(Level.INFO, "Adding departure->arrival flights info to table");
+                departureLabelOut.setText(departureCode);
+                arrivalLabelOut.setText(arrivalCode);
+                addFlightToTable(depFlights, departureTable);
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(null,
+                "No flights available for this combination",
+                "Flight Availability Warning",
                 JOptionPane.WARNING_MESSAGE);
-        }
+            }
+        };
+        flightInfoController.searchDirectFlight(departureCode, localTime, arrivalCode, receiver);
         //Get return flight from arrival -> departure airport
         if (roundtripCheckBox.isSelected())
         {
             flightSystemUILogger.log(Level.INFO,"Getting return flights");
-            Flights arrivalFlights = ServerInterface.INSTANCE.getFlights("CS509team1", arrivalCode, localTimeReturn, ServerInterface.QueryFlightType.DEPART, getFilter(departureCode));
-        if (arrivalFlights.size() > 0 )
-        {
-            flightSystemUILogger.log(Level.INFO, "Adding arrival flight info to table");
-            departureLabelIn.setText(arrivalCode);
-            arrivalLableIn.setText(departureCode);
-            addFlightToTable(arrivalFlights, arrivalTable);
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(null,
-            "No return flights available for this combination",
-            "Flight Availability Warning",
-                JOptionPane.WARNING_MESSAGE);
-        }
+            //Flights arrivalFlights = ServerInterface.INSTANCE.getFlights("CS509team1", arrivalCode, localTimeReturn, ServerInterface.QueryFlightType.DEPART, getFilter(departureCode));
+            FlightInfoController.FlightsReceiver arrivalReceiver = (Flights arrivalFlights) -> {
+                if (arrivalFlights.size() > 0 )
+                {
+                    flightSystemUILogger.log(Level.INFO, "Adding arrival flight info to table");
+                    departureLabelIn.setText(arrivalCode);
+                    arrivalLableIn.setText(departureCode);
+                    addFlightToTable(arrivalFlights, arrivalTable);
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null,
+                        "No return flights available for this combination",
+                        "Flight Availability Warning",
+                        JOptionPane.WARNING_MESSAGE);
+                }
+            };
+            flightInfoController.searchDirectFlight(arrivalCode, localTimeReturn, departureCode, arrivalReceiver);
         }
     }
     private void addFlightToTable(Flights flights, javax.swing.JTable table)

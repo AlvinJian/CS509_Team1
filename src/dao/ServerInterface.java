@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import utils.QueryFactory;
 import flight.Flights;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 
 /**
@@ -101,9 +103,8 @@ public enum ServerInterface {
             public boolean isValid(Flight f);
         }
         
-        // TODO need yun's implementation
         public Flights getFlights(String teamName, String airportCode, 
-                LocalDateTime searchDateTime, QueryFlightType type, QueryFlightFilter filter) {
+                LocalDateTime gmtDateTime, QueryFlightType type, QueryFlightFilter filter) {
             URL url;
             HttpURLConnection connection;
             BufferedReader reader;
@@ -129,8 +130,8 @@ public enum ServerInterface {
 		/**
 		 * Create an HTTP connection to the server for a GET 
 		 */
-                LocalDate searchDate = searchDateTime.toLocalDate();
-                String dateStr = searchDate.format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
+                LocalDate gmtDate = gmtDateTime.toLocalDate();
+                String dateStr = gmtDate.format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
 		url = new URL(mUrlBase + QueryFactory.getFlights(teamName, typeStr, 
                         airportCode, dateStr));
 		connection = (HttpURLConnection) url.openConnection();
