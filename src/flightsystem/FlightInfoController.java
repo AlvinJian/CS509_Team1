@@ -69,19 +69,21 @@ public class FlightInfoController {
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
+                    Flights ret;
                     synchronized (serverLck) {
-                        directFlightsCache = SearchFlightsImpl(fromAirportCode, fromTime, 
-                            toAirportCode);
-                        controllerLogger.log(logLevel, "flight count={0}", directFlightsCache.size());
+                        ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode);
+                        controllerLogger.log(logLevel, "flight count={0}", ret.size());
                         prevFlightsQuery = queryParam;
+                        directFlightsCache = ret;
                     }
-                    Runnable _r = () -> receiver.onReceived(directFlightsCache);
+                    Runnable _r = () -> receiver.onReceived(ret);
                     SwingUtilities.invokeLater(_r);
                 }
             };
             Thread t = new Thread(r);
             t.start();
         } else {
+            controllerLogger.log(logLevel, "use flights cache!");
             receiver.onReceived(directFlightsCache);
         }
         
