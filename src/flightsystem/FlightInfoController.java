@@ -114,8 +114,8 @@ public class FlightInfoController {
             }
             return false;
         };
-        Flights ret = ServerInterface.INSTANCE.getFlights(teamName, fromAirport.code(), 
-                gmtFromDateTime, ServerInterface.QueryFlightType.DEPART, arrivalFilter);
+        Flights ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
+                gmtFromDateTime, arrivalFilter);
         return ret;
     }
     

@@ -103,8 +103,7 @@ public enum ServerInterface {
             public boolean isValid(Flight f);
         }
         
-        public Flights getFlights(String teamName, String airportCode, 
-                LocalDateTime gmtDateTime, QueryFlightType type, QueryFlightFilter filter) {
+        public Flights getFlights(String teamName, QueryFlightType type, String airportCode, LocalDateTime gmtDateTime, QueryFlightFilter filter) {
             URL url;
             HttpURLConnection connection;
             BufferedReader reader;
