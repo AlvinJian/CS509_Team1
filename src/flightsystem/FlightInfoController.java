@@ -33,7 +33,7 @@ public class FlightInfoController {
     
     static {
         controllerLogger = Logger.getLogger(FlightInfoController.class.getName());
-        controllerLogger.setLevel(Level.INFO);
+        controllerLogger.setLevel(Level.FINE);
     }
     
     private FlightsQueryParam prevFlightsQuery;
@@ -59,6 +59,14 @@ public class FlightInfoController {
         if (airportsCache == null) {
             syncAirports();
         }
+        controllerLogger.log(Level.INFO, "fromAirportCode={0}, fromTime={1}, toAirportCode={2}, receiver={3}", 
+                new Object[] {fromAirportCode, fromTime, toAirportCode, receiver});
+        if (fromAirportCode == null || fromTime == null || toAirportCode == null
+                || receiver == null) {
+            controllerLogger.log(Level.SEVERE, "searchDirectFlight args error");
+            receiver.onReceived(new Flights());
+            return;
+        }
         final Level logLevel = Level.INFO;
         final FlightsQueryParam queryParam = new FlightsQueryParam();
         queryParam.fromAirportCode = fromAirportCode;
@@ -72,6 +80,7 @@ public class FlightInfoController {
                     Flights ret;
                     synchronized (serverLck) {
                         ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode);
+                        
                         controllerLogger.log(logLevel, "flight count={0}", ret.size());
                         prevFlightsQuery = queryParam;
                         directFlightsCache = ret;
