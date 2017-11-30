@@ -26,5 +26,6 @@ build/
 
 # irrelevant netbean properties
 nbproject/private/
+nbproject/project.properties
 
 .DS_Store
