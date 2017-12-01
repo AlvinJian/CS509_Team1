@@ -12,10 +12,10 @@ import dao.ServerInterface;
 import flight.Flight;
 import flight.Flights;
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +39,7 @@ public class FlightInfoController {
     private FlightsQueryParam prevFlightsQuery;
     private Flights directFlightsCache;
     private Airports airportsCache;
+    private List<ArrayList<Flight>> stopoverFlights;
     
     public FlightInfoController() {
     }
@@ -98,6 +99,10 @@ public class FlightInfoController {
         
     }
     
+    public void searchStopoverFlight() {
+    
+    }
+    
     private Flights SearchFlightsImpl(String fromAirportCode, LocalDateTime fromTime, 
             String toAirportCode) {
         final Airport fromAirport = getAirportByCode(fromAirportCode);
@@ -117,6 +122,10 @@ public class FlightInfoController {
         Flights ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
                 gmtFromDateTime, arrivalFilter);
         return ret;
+    }
+    
+    private void searchDFS(Flight fromAirport, int stopover) {
+        
     }
     
     private Airport getAirportByCode(String code) {
