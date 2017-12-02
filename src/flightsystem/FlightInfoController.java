@@ -38,7 +38,7 @@ public class FlightInfoController {
 
     private Flights directFlightsCache;
     private Airports airportsCache;
-    private List<ArrayList<Flight>> stopoverFlights;
+    private List<ArrayList<Flight>> stopoverFlights = new ArrayList<>();
     
     public FlightInfoController() {
     }
@@ -85,8 +85,52 @@ public class FlightInfoController {
         t.start();
     }
     
-    public void searchStopoverFlight() {
+    private Flights SearchStopoverFlightsImpl(String fromAirportCode, LocalDateTime fromTime, 
+            String toAirportCode, int level) {
+        final Airport fromAirport = getAirportByCode(fromAirportCode);
+        
+        ZoneId fromZoneId = AirportZoneMap.GetTimeZoneByAiport(fromAirport);
+        ZonedDateTime zonedFromDateTime = ZonedDateTime.of(fromTime, fromZoneId);               
+        LocalDateTime gmtFromDateTime = zonedFromDateTime.withZoneSameInstant(
+            ZoneId.of("GMT")).toLocalDateTime();
+        Flights ret = null;
+        if(level == 1) {
+            stopoverFlights.set(0, new ArrayList<>());
+            ServerInterface.QueryFlightFilter arrivalFilter = (Flight f) -> {
+                if (f == null) return false;
+                if (f.getmArrAirport().equals(toAirportCode)) {
+                    if (f.getmDepTime().isAfter(gmtFromDateTime)) {
+                        return true;
+                    }
+                }
+            return false;
+        };
+        ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
+                gmtFromDateTime, arrivalFilter);
+        DFS(ret, new ArrayList<>(), gmtFromDateTime);
+        } else {
+        ServerInterface.QueryFlightFilter arrivalFilter = (Flight f) -> {
+            if (f == null) return false;
+            if (f.getmDepTime().isAfter(fromTime)) {
+                    return true;
+            }
+            return false;
+        };
+        ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
+                gmtFromDateTime, arrivalFilter);
+        DFS(ret, new ArrayList<>(), fromTime);
+        }
+        return ret;
+    }
     
+    private void DFS(Flights flights, List<Flight> list, LocalDateTime fromTime) {
+        if(flights == null)
+            return;
+        int start_index = stopoverFlights.size() - 1;
+        for(Flight flight: flights) {
+            if(flight.getmDepTime().isAfter(fromTime)) {
+            }
+        }
     }
     
     private Flights SearchFlightsImpl(String fromAirportCode, LocalDateTime fromTime, 
@@ -108,10 +152,6 @@ public class FlightInfoController {
         Flights ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
                 gmtFromDateTime, arrivalFilter);
         return ret;
-    }
-    
-    private void searchDFS(Flight fromAirport, int stopover) {
-        
     }
     
     private Airport getAirportByCode(String code) {
