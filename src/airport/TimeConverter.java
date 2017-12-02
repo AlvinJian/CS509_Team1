@@ -29,8 +29,13 @@ public class TimeConverter {
     }
     
     public LocalDateTime convertDateTimeByAiport(LocalDateTime origTime, Airport inAirport) {
-        ZoneId toZone = AirportZoneMap.GetTimeZoneByAiport(inAirport);
-        ZonedDateTime zonedT = ZonedDateTime.of(origTime, this.zoneId);
-        return zonedT.withZoneSameInstant(toZone).toLocalDateTime();
+        try {
+            ZoneId toZone = AirportZoneMap.GetTimeZoneByAiport(inAirport);
+            ZonedDateTime zonedT = ZonedDateTime.of(origTime, this.zoneId);
+            return zonedT.withZoneSameInstant(toZone).toLocalDateTime();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
