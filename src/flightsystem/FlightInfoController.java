@@ -35,8 +35,7 @@ public class FlightInfoController {
         controllerLogger = Logger.getLogger(FlightInfoController.class.getName());
         controllerLogger.setLevel(Level.FINE);
     }
-    
-    private FlightsQueryParam prevFlightsQuery;
+
     private Flights directFlightsCache;
     private Airports airportsCache;
     private List<ArrayList<Flight>> stopoverFlights;
@@ -69,34 +68,21 @@ public class FlightInfoController {
             return;
         }
         final Level logLevel = Level.INFO;
-        final FlightsQueryParam queryParam = new FlightsQueryParam();
-        queryParam.fromAirportCode = fromAirportCode;
-        queryParam.fromTime = fromTime;
-        queryParam.toAirportCode = toAirportCode;
-        queryParam.layoverCount = 0;
-        if (prevFlightsQuery == null || !prevFlightsQuery.equals(queryParam)) {
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    Flights ret;
-                    synchronized (serverLck) {
-                        ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode);
-                        
-                        controllerLogger.log(logLevel, "flight count={0}", ret.size());
-                        prevFlightsQuery = queryParam;
-                        directFlightsCache = ret;
-                    }
-                    Runnable _r = () -> receiver.onReceived(ret);
-                    SwingUtilities.invokeLater(_r);
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                Flights ret;
+                synchronized (serverLck) {
+                    ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode);
+                    controllerLogger.log(logLevel, "flight count={0}", ret.size());
+                    directFlightsCache = ret;
                 }
-            };
-            Thread t = new Thread(r);
-            t.start();
-        } else {
-            controllerLogger.log(logLevel, "use flights cache!");
-            receiver.onReceived(directFlightsCache);
-        }
-        
+                Runnable _r = () -> receiver.onReceived(ret);
+                SwingUtilities.invokeLater(_r);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
     }
     
     public void searchStopoverFlight() {
@@ -138,49 +124,5 @@ public class FlightInfoController {
             }
         }
         return ret;
-    }
-    
-    private class FlightsQueryParam {
-        String fromAirportCode;
-        LocalDateTime fromTime; 
-        String toAirportCode; 
-        int layoverCount;
-
-        @Override
-        public int hashCode() {
-            int hash = 5;
-            hash = 29 * hash + Objects.hashCode(this.fromAirportCode);
-            hash = 29 * hash + Objects.hashCode(this.fromTime);
-            hash = 29 * hash + Objects.hashCode(this.toAirportCode);
-            hash = 29 * hash + this.layoverCount;
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final FlightsQueryParam other = (FlightsQueryParam) obj;
-            if (this.layoverCount != other.layoverCount) {
-                return false;
-            }
-            if (!Objects.equals(this.fromAirportCode, other.fromAirportCode)) {
-                return false;
-            }
-            if (!Objects.equals(this.toAirportCode, other.toAirportCode)) {
-                return false;
-            }
-            if (!Objects.equals(this.fromTime, other.fromTime)) {
-                return false;
-            }
-            return true;
-        }   
     }
 }
