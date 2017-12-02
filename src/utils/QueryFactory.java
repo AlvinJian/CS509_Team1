@@ -55,5 +55,9 @@ public class QueryFactory {
         public static String reserveSeat(String teamName) {
                 return "team=" + teamName + "&action=buyTicket&flightData=";
         }
+        
+        public static String resetDB(String teamName) {
+                return "team=" + teamName + "&action=resetDB";
+        }
 
 }
