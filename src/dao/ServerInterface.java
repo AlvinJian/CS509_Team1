@@ -3,6 +3,7 @@
  */
 package dao;
 
+import airplane.Airplanes;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,8 +19,6 @@ import java.time.format.DateTimeFormatter;
 import utils.QueryFactory;
 import flight.Flights;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 
 /**
@@ -90,6 +89,55 @@ public enum ServerInterface {
 		airports = DaoAirport.addAll(xmlAirports);
 		return airports;
 		
+	}
+        
+        public Airplanes getAirplanes(String teamName) {
+
+		URL url;
+		HttpURLConnection connection;
+		BufferedReader reader;
+		String line;
+		StringBuffer result = new StringBuffer();
+
+		String xmlAirplanes;
+		Airplanes airplanes;
+
+		try {
+			/**
+			 * Create an HTTP connection to the server for a GET
+			 */
+			url = new URL(mUrlBase + QueryFactory.getAirplanes(teamName));
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("User-Agent", teamName);
+
+			/**
+			 * If response code of SUCCESS read the XML string returned line by
+			 * line to build the full return string
+			 */
+			int responseCode = connection.getResponseCode();
+			if (responseCode >= HttpURLConnection.HTTP_OK) {
+				InputStream inputStream = connection.getInputStream();
+				String encoding = connection.getContentEncoding();
+				encoding = (encoding == null ? "UTF-8" : encoding);
+
+				reader = new BufferedReader(new InputStreamReader(inputStream));
+				while ((line = reader.readLine()) != null) {
+					result.append(line);
+				}
+				reader.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		xmlAirplanes = result.toString();
+		System.out.println(xmlAirplanes);
+		airplanes = DaoAirplane.addAll(xmlAirplanes);
+		return airplanes;
+
 	}
         
         private static final String _DEPART = "departing";
@@ -274,4 +322,55 @@ public enum ServerInterface {
 		}
 		return true;
 	}
+        
+        public boolean reserveSeat(String teamName) {
+        		URL url;
+		HttpURLConnection connection;
+		
+		try {
+			url = new URL(mUrlBase);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST");
+			
+			String params = QueryFactory.reserveSeat(teamName);
+			
+			connection.setDoOutput(true);
+			connection.setDoInput(true);
+			
+                        String xmlData =    "<Flights>\n" +
+                                            "<Flight number=DDDDD seating=SEAT_TYPE/>\n" +
+                                            "<Flight number=DDDDD seating=SEAT_TYPE/>\n" +
+                                            "</Flights>";
+			DataOutputStream writer = new DataOutputStream(connection.getOutputStream());
+			writer.writeBytes(params + xmlData);
+			writer.flush();
+			writer.close();
+		    
+			int responseCode = connection.getResponseCode();
+			System.out.println("\nSending 'POST' to unlock database");
+			System.out.println(("\nResponse Code : " + responseCode));
+
+			if (responseCode >= HttpURLConnection.HTTP_OK) {
+				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+				String line;
+				StringBuffer response = new StringBuffer();
+
+				while ((line = in.readLine()) != null) {
+					response.append(line);
+				}
+				in.close();
+
+				System.out.println(response.toString());
+			}
+		}
+		catch (IOException ex) {
+			ex.printStackTrace();
+			return false;
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+		return true;	
+        }
 }
