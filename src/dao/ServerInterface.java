@@ -18,6 +18,7 @@ import flight.Flight;
 import java.time.format.DateTimeFormatter;
 import utils.QueryFactory;
 import flight.Flights;
+import flight.ReserveFlight;
 import java.time.LocalDateTime;
 
 
@@ -323,7 +324,8 @@ public enum ServerInterface {
 		return true;
 	}
         
-        public boolean reserveSeat(String teamName) {
+        
+        public boolean reserveSeat(String teamName, ReserveFlight reserveFlightObj) {
         		URL url;
 		HttpURLConnection connection;
 		
@@ -337,10 +339,11 @@ public enum ServerInterface {
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
 			
-                        String xmlData =    "<Flights>\n" +
-                                            "<Flight number=DDDDD seating=SEAT_TYPE/>\n" +
-                                            "<Flight number=DDDDD seating=SEAT_TYPE/>\n" +
-                                            "</Flights>";
+                        String xmlData = reserveFlightObj.getXML();
+//                        String xmlData =    "<Flights>\n" +
+//                                            "<Flight number=DDDDD seating=SEAT_TYPE/>\n" +
+//                                            "<Flight number=DDDDD seating=SEAT_TYPE/>\n" +
+//                                            "</Flights>";
 			DataOutputStream writer = new DataOutputStream(connection.getOutputStream());
 			writer.writeBytes(params + xmlData);
 			writer.flush();

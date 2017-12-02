@@ -5,6 +5,7 @@
  */
 package flightsystem;
 
+import airplane.Airplane;
 import airport.Airport;
 import airport.AirportZoneMap;
 import airport.Airports;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -176,4 +178,30 @@ public class FlightInfoController {
         }
         return ret;
     }
+    
+    private boolean seatMatch(Flight flight, Airplane airplane, String seattype) {
+        boolean availableSeats = false;
+
+        if (seattype.equalsIgnoreCase("coach")) {
+            int mSeatsCoach = flight.getmSeatsCoach();
+            int mCoachSeats = airplane.getmCoachSeats();
+            int remCoachSeats = mCoachSeats - mSeatsCoach;
+            if (remCoachSeats > 0) {
+                availableSeats = true;
+            }
+
+        } else if (seattype.equalsIgnoreCase("firstclass")) {
+            int mSeatsFirst = flight.getmSeatsFirst();
+            int mFirstClassSeats = airplane.getmFirstClassSeats();
+            int remFirstClassSeats = mFirstClassSeats - mSeatsFirst;
+            if (remFirstClassSeats > 0) {
+                availableSeats = true;
+            }
+        }
+
+        return availableSeats;
+
+    }
 }
+
+

@@ -30,7 +30,6 @@ public static ZoneId GetTimeZoneByAiport(Airport airport) {
             
             String outID = timezoneobj.getString("timeZoneId");
             ZoneId ret = ZoneId.of(outID);
-            System.out.println(ret);
             return ret;
         } catch (Exception e) {
             e.printStackTrace();
