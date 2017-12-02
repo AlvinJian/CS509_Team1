@@ -85,8 +85,8 @@ public class FlightInfoController {
         t.start();
     }
     
-    private Flights SearchStopoverFlightsImpl(String fromAirportCode, LocalDateTime fromTime, 
-            String toAirportCode, int level) {
+    private List<ArrayList<Flight>> SearchStopoverFlightsImpl(String fromAirportCode, LocalDateTime fromTime, 
+            String toAirportCode, int level, int stopover) {
         final Airport fromAirport = getAirportByCode(fromAirportCode);
         
         ZoneId fromZoneId = AirportZoneMap.GetTimeZoneByAiport(fromAirport);
@@ -107,7 +107,8 @@ public class FlightInfoController {
         };
         ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
                 gmtFromDateTime, arrivalFilter);
-        DFS(ret, new ArrayList<>(), gmtFromDateTime);
+        DFS(ret, new ArrayList<>(), gmtFromDateTime, toAirportCode, level, stopover);
+        return stopoverFlights;
         } else {
         ServerInterface.QueryFlightFilter arrivalFilter = (Flight f) -> {
             if (f == null) return false;
@@ -118,18 +119,28 @@ public class FlightInfoController {
         };
         ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
                 gmtFromDateTime, arrivalFilter);
-        DFS(ret, new ArrayList<>(), fromTime);
+        DFS(ret, new ArrayList<>(), fromTime, toAirportCode, level, stopover);
         }
-        return ret;
+        return stopoverFlights;
     }
     
-    private void DFS(Flights flights, List<Flight> list, LocalDateTime fromTime) {
+    private void DFS(Flights flights, List<Flight> list, LocalDateTime fromTime, String toAirportCode, int level, int stopover) {
         if(flights == null)
             return;
-        int start_index = stopoverFlights.size() - 1;
+        
+        level++;
         for(Flight flight: flights) {
-            if(flight.getmDepTime().isAfter(fromTime)) {
+            list.add(flight);
+            if(level == stopover + 2) {
+                if(flight.getmArrAirport().equals(toAirportCode)) {
+                    stopoverFlights.add(new ArrayList<>(list));
+                    return;
+                }
             }
+            if(flight.getmDepTime().isAfter(fromTime)) {
+                SearchStopoverFlightsImpl(flight.getmDepAirport(), flight.getmDepTime(), toAirportCode, level, stopover);
+            }
+            list.remove(list.size() - 1);
         }
     }
     
