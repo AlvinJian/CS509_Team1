@@ -54,8 +54,11 @@ public class FlightInfoController {
     }
 
     public interface FlightsReceiver {
-
         public void onReceived(Flights ret);
+    }
+    
+    public interface StopoverFlightsReceiver {
+        public void onReceived(List<List<Flight>> ret);
     }
 
     public Airports syncAirports() {
@@ -87,14 +90,36 @@ public class FlightInfoController {
                     ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode, seatTypes);
                     controllerLogger.log(logLevel, "flight count={0}", ret.size());
                     directFlightsCache = ret;
-                    /* TODO remove this afterward */
-                    List<List<Flight>> testRet = _SearchStopoverFlightsImpl(fromAirportCode, fromTime, 
-                            toAirportCode, seatTypes, 1);
-                    stopOverSearchTest(testRet);
                 }
                 Runnable _r = () -> receiver.onReceived(ret);
                 SwingUtilities.invokeLater(_r);
             }
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+    
+    public void SearchStopoverFlights(String depAirportCode, LocalDateTime depTime, 
+            String arrAirportCode, List<String> seatTypes, int stopover, 
+            StopoverFlightsReceiver receiver) {
+        if (depAirportCode == null || depTime == null || arrAirportCode == null ||
+                seatTypes == null) {
+            controllerLogger.log(Level.SEVERE, "SearchStopoverFlights args error");
+            List<List<Flight>> ret = new ArrayList<>();
+            ret.add(new ArrayList<>());
+            receiver.onReceived(ret);
+            return;
+        }
+        final Level logLevel = Level.INFO;
+        Runnable r = () -> {
+            List<List<Flight>> ret;
+            synchronized (serverLck) {
+                ret = _SearchStopoverFlightsImpl(depAirportCode, depTime, 
+                        arrAirportCode, seatTypes, stopover);
+            }
+            controllerLogger.log(logLevel, "flight count={0}", ret.size());
+            Runnable _r = () -> receiver.onReceived(ret);
+            SwingUtilities.invokeLater(_r);
         };
         Thread t = new Thread(r);
         t.start();
@@ -157,7 +182,7 @@ public class FlightInfoController {
         return Duration.between(t1, t2).toMinutes();
     }
     
-    List<List<Flight>> _stopoverFlights;
+    private List<List<Flight>> _stopoverFlights;
     
     private List<List<Flight>> _SearchStopoverFlightsImpl(String depAirportCode, 
             LocalDateTime depTime, String arrAirportCode, List<String> seatTypes, int stopover) {
