@@ -52,10 +52,14 @@ public class DaoFlight {
             //if (flight.isValid()) {
             if (flight != null) {
                 flights.add(flight);
+                String depCode = flight.getmDepAirport();
+                String arrCode = flight.getmArrAirport();
+//                flightLogger.log(Level.INFO, "depCode={0} arrCode={1}", new Object[] {
+//                    depCode, arrCode});
             }
             //}
         }
-        flightLogger.log(Level.INFO, "flight entries={0}", flights.size());
+        //flightLogger.log(Level.INFO, "flight entries={0}", flights.size());
         return flights;
     }
     
