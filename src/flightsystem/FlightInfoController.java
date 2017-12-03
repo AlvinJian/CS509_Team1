@@ -284,7 +284,7 @@ public class FlightInfoController {
         for (Flight f: flights) {
             List<Flight> newHistory = new ArrayList<>(history);
             newHistory.add(f);
-            if (newHistory.size() == stopover+2) {
+            if (newHistory.size() == stopover+1) {
                 if (f.getmArrAirport().equals(arrAirportCode)) {
                     _stopoverFlights.add(newHistory);
                 }
