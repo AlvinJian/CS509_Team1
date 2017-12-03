@@ -3,6 +3,10 @@ package airplane;
 import java.util.Comparator;
 
 public class Airplane implements Comparable<Airplane>, Comparator<Airplane> {
+    
+    public static String COACH = "coach";
+    public static String FIRST = "firstclass";
+    
 	private String mManufacturer; // Full name of the airport
 	private String mModel; // Three character code of the airport
 	private int mFirstClassSeats; // Latitude of airport in decimal format

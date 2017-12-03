@@ -6,21 +6,26 @@
 package flightsystem;
 
 import airplane.Airplane;
+import airplane.Airplanes;
 import airport.Airport;
 import airport.AirportZoneMap;
 import airport.Airports;
+import airport.TimeConverter;
 import dao.ServerInterface;
 import flight.Flight;
 import flight.FlightConfirmation;
 import flight.Flights;
 import flight.ReserveFlight;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -29,12 +34,13 @@ import javax.swing.SwingUtilities;
  *
  * @author alvin
  */
-public class FlightInfoController {    
+public class FlightInfoController {
+
     private static final Object serverLck = new Object();
     // TODO shouldn't be here
     private static final String teamName = "CS509team1";
     private static final Logger controllerLogger;
-    
+
     static {
         controllerLogger = Logger.getLogger(FlightInfoController.class.getName());
         controllerLogger.setLevel(Level.FINE);
@@ -42,11 +48,13 @@ public class FlightInfoController {
 
     private Flights directFlightsCache;
     private Airports airportsCache;
+    private Map<String, Airplane> airplaneCache;
     private List<ArrayList<Flight>> stopoverFlights = new ArrayList<>();
-    
+
     public FlightInfoController() {
+        syncAirplanes();
     }
-    
+
     public interface FlightsReceiver {
         public void onReceived(Flights ret);
     }
@@ -54,6 +62,11 @@ public class FlightInfoController {
     {
         public void onReceived(FlightConfirmation confirm);
     }
+    
+    public interface StopoverFlightsReceiver {
+        public void onReceived(List<List<Flight>> ret);
+    }
+
     public Airports syncAirports() {
         synchronized (serverLck) {
             airportsCache = ServerInterface.INSTANCE.getAirports(teamName);
@@ -81,8 +94,8 @@ public class FlightInfoController {
                 synchronized (serverLck) {
                     
                 }
-                Runnable _r = () -> receiver.onReceived(flightConfirm);
-                SwingUtilities.invokeLater(_r);
+                //Runnable _r = () -> receiver.onReceived(flightConfirm);
+                //SwingUtilities.invokeLater(_r);
             }
             };
             Thread t = new Thread(r);
@@ -91,13 +104,13 @@ public class FlightInfoController {
         
         
     }
-    public void searchDirectFlight(String fromAirportCode, LocalDateTime fromTime, 
-            String toAirportCode, FlightsReceiver receiver) {
+    public void searchDirectFlight(String fromAirportCode, LocalDateTime fromTime,
+            String toAirportCode, List<String> seatTypes, FlightsReceiver receiver) {
         if (airportsCache == null) {
             syncAirports();
         }
-        controllerLogger.log(Level.INFO, "fromAirportCode={0}, fromTime={1}, toAirportCode={2}, receiver={3}", 
-                new Object[] {fromAirportCode, fromTime, toAirportCode, receiver});
+//        controllerLogger.log(Level.INFO, "fromAirportCode={0}, fromTime={1}, toAirportCode={2}, receiver={3}",
+//                new Object[]{fromAirportCode, fromTime, toAirportCode, receiver});
         if (fromAirportCode == null || fromTime == null || toAirportCode == null
                 || receiver == null) {
             controllerLogger.log(Level.SEVERE, "searchDirectFlight args error");
@@ -110,7 +123,7 @@ public class FlightInfoController {
             public void run() {
                 Flights ret;
                 synchronized (serverLck) {
-                    ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode);
+                    ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode, seatTypes);
                     controllerLogger.log(logLevel, "flight count={0}", ret.size());
                     directFlightsCache = ret;
                 }
@@ -122,90 +135,202 @@ public class FlightInfoController {
         t.start();
     }
     
-    private List<ArrayList<Flight>> SearchStopoverFlightsImpl(String fromAirportCode, LocalDateTime fromTime, 
-            String toAirportCode, int level, int stopover) {
-        final Airport fromAirport = getAirportByCode(fromAirportCode);
-        
-        ZoneId fromZoneId = AirportZoneMap.GetTimeZoneByAiport(fromAirport);
-        ZonedDateTime zonedFromDateTime = ZonedDateTime.of(fromTime, fromZoneId);               
-        LocalDateTime gmtFromDateTime = zonedFromDateTime.withZoneSameInstant(
-            ZoneId.of("GMT")).toLocalDateTime();
-        Flights ret = null;
-        if(level == 1) {
-            stopoverFlights.set(0, new ArrayList<>());
-            ServerInterface.QueryFlightFilter arrivalFilter = (Flight f) -> {
+    public void SearchStopoverFlights(String depAirportCode, LocalDateTime depTime, 
+            String arrAirportCode, List<String> seatTypes, int stopover, 
+            StopoverFlightsReceiver receiver) {
+        if (depAirportCode == null || depTime == null || arrAirportCode == null ||
+                seatTypes == null) {
+            controllerLogger.log(Level.SEVERE, "SearchStopoverFlights args error");
+            List<List<Flight>> ret = new ArrayList<>();
+            ret.add(new ArrayList<>());
+            receiver.onReceived(ret);
+            return;
+        }
+        final Level logLevel = Level.INFO;
+        Runnable r = () -> {
+            List<List<Flight>> ret;
+            synchronized (serverLck) {
+                ret = _SearchStopoverFlightsImpl(depAirportCode, depTime, 
+                        arrAirportCode, seatTypes, stopover);
+            }
+            controllerLogger.log(logLevel, "flight count={0}", ret.size());
+            Runnable _r = () -> receiver.onReceived(ret);
+            SwingUtilities.invokeLater(_r);
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+    private void stopOverSearchTest(List<List<Flight>> trial) {
+        Level level = Level.INFO;
+        controllerLogger.log(level, "trialSize={0}", trial.size());
+        for (List<Flight> sublist : trial) {
+            StringBuilder builder = new StringBuilder();
+            for (Flight f : sublist) {
+                String depCode = f.getmDepAirport();
+                LocalDateTime depDateTime = f.getmDepTime();
+                String arrCode = f.getmArrAirport();
+                LocalDateTime arrDateTime = f.getmArrTime();
+                String msg = String.format("depCode=%s depDateTime=%s arrCode=%s arrDateTime=%s",
+                        depCode, depDateTime.toString(), arrCode, arrDateTime.toString());
+                controllerLogger.log(level, msg);
+                builder.append(f.getmNumber());
+                builder.append(", ");
+            }
+            controllerLogger.log(level, builder.toString());
+        }
+    }
+
+    private boolean isInDfsHistory(List<Flight> list, Flight flight) {
+        controllerLogger.log(Level.INFO, "===START===");
+        StringBuilder builder = new StringBuilder();
+        for (Flight f : list) {
+            String depCode = f.getmDepAirport();
+            LocalDateTime depDateTime = f.getmDepTime();
+            String arrCode = f.getmArrAirport();
+            LocalDateTime arrDateTime = f.getmArrTime();
+            String msg = String.format("depCode=%s depDateTime=%s arrCode=%s arrDateTime=%s",
+                    depCode, depDateTime.toString(), arrCode, arrDateTime.toString());
+            controllerLogger.log(Level.INFO, msg);
+            builder.append(f.getmNumber());
+            builder.append(", ");
+            if (flight.getmArrAirport().equals(f.getmDepAirport())) {
+                return true;
+            }
+        }
+        controllerLogger.log(Level.INFO, builder.toString());
+        controllerLogger.log(Level.INFO, "===END===");
+        return false;
+    }
+
+    // t2 - t1
+    private static long hourSubstract(LocalDateTime t1, LocalDateTime t2) {
+        int h2 = t2.getHour();
+        int h1 = t1.getHour();
+        LocalDate d2 = t2.toLocalDate();
+        LocalDate d1 = t1.toLocalDate();
+        if ( t1.getDayOfMonth() != t2.getDayOfMonth())
+        {
+            controllerLogger.log(Level.INFO, "FOUND ROLLOVER DATE ***");
+            controllerLogger.log(Level.INFO, "*********" + Duration.between(t1, t2).toMinutes());
+        }
+
+        return Duration.between(t1, t2).toMinutes();
+    }
+    
+    private List<List<Flight>> _stopoverFlights;
+    
+    private List<List<Flight>> _SearchStopoverFlightsImpl(String depAirportCode, 
+            LocalDateTime depTime, String arrAirportCode, List<String> seatTypes, int stopover) {
+        Airport depAirport = getAirportByCode(depAirportCode);
+        ZoneId depZoneId = AirportZoneMap.GetTimeZoneByAiport(depAirport);
+        ZonedDateTime zonedDepDateTime = ZonedDateTime.of(depTime, depZoneId);
+        LocalDateTime gmtDepDateTime = zonedDepDateTime.withZoneSameInstant(
+                    ZoneId.of("GMT")).toLocalDateTime();
+        ServerInterface.QueryFlightFilter lv1Filter = new ServerInterface.QueryFlightFilter() {
+            @Override
+            public boolean isValid(Flight f) {
                 if (f == null) return false;
-                if (f.getmArrAirport().equals(toAirportCode)) {
-                    if (f.getmDepTime().isAfter(gmtFromDateTime)) {
-                        return true;
+                for (String seatType: seatTypes) {
+                    if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
+                        return false;
                     }
                 }
-            return false;
-        };
-        ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
-                gmtFromDateTime, arrivalFilter);
-        DFS(ret, new ArrayList<>(), gmtFromDateTime, toAirportCode, level, stopover);
-        return stopoverFlights;
-        } else {
-        ServerInterface.QueryFlightFilter arrivalFilter = (Flight f) -> {
-            if (f == null) return false;
-            if (f.getmDepTime().isAfter(fromTime)) {
+                if (f.getmDepTime().isAfter(gmtDepDateTime)) {
                     return true;
-            }
-            return false;
-        };
-        ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
-                gmtFromDateTime, arrivalFilter);
-        DFS(ret, new ArrayList<>(), fromTime, toAirportCode, level, stopover);
-        }
-        return stopoverFlights;
-    }
-    
-    private void DFS(Flights flights, List<Flight> list, LocalDateTime fromTime, String toAirportCode, int level, int stopover) {
-        if(flights == null)
-            return;
-        
-        level++;
-        for(Flight flight: flights) {
-            list.add(flight);
-            if(level == stopover + 2) {
-                if(flight.getmArrAirport().equals(toAirportCode)) {
-                    stopoverFlights.add(new ArrayList<>(list));
-                    return;
+                } else {
+                    return false;
                 }
             }
-            if(flight.getmDepTime().isAfter(fromTime)) {
-                SearchStopoverFlightsImpl(flight.getmDepAirport(), flight.getmDepTime(), toAirportCode, level, stopover);
-            }
-            list.remove(list.size() - 1);
+        };
+        _stopoverFlights = new ArrayList<>();
+        Flights flights = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, 
+                depAirportCode, gmtDepDateTime, lv1Filter);
+        int level = 1;
+        for (Flight f: flights) {
+            String nextDepAirportCode = f.getmArrAirport();
+            LocalDateTime nextDepDateTime = f.getmArrTime();
+            List<Flight> history = new ArrayList<>();
+            history.add(f);
+            _SearchStopoverFlightsInnr(history, nextDepAirportCode, nextDepDateTime, 
+                    arrAirportCode, seatTypes, level + 1, stopover);
         }
+
+        return _stopoverFlights;
     }
     
-    private Flights SearchFlightsImpl(String fromAirportCode, LocalDateTime fromTime, 
-            String toAirportCode) {
+    private void _SearchStopoverFlightsInnr(List<Flight> history, 
+            String depAirportCode, LocalDateTime depTime, String arrAirportCode, 
+            List<String> seatTypes, int level, int stopover) {
+        ServerInterface.QueryFlightFilter highLvFilter = new ServerInterface.QueryFlightFilter() {
+            @Override
+            public boolean isValid(Flight f) {
+                if (f == null) return false;
+                for (String seatType: seatTypes) {
+                    if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
+                        return false;
+                    }
+                }
+                long diff = hourSubstract(depTime, f.getmDepTime());
+                if ((diff >= 30 && diff <= 240) && !isInDfsHistory(history, f)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        Flights flights = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, 
+                depAirportCode, depTime, highLvFilter);
+        for (Flight f: flights) {
+            List<Flight> newHistory = new ArrayList<>(history);
+            newHistory.add(f);
+            if (newHistory.size() == stopover+2) {
+                if (f.getmArrAirport().equals(arrAirportCode)) {
+                    _stopoverFlights.add(newHistory);
+                }
+            } else {
+                String nextDepAirportCode = f.getmArrAirport();
+                LocalDateTime nextDepDateTime = f.getmArrTime();
+                _SearchStopoverFlightsInnr(newHistory, nextDepAirportCode, nextDepDateTime, 
+                    arrAirportCode, seatTypes, level + 1, stopover);
+            }
+        }
+    }
+
+    private Flights SearchFlightsImpl(String fromAirportCode, LocalDateTime fromTime,
+            String toAirportCode, List<String> seatTypes) {
         final Airport fromAirport = getAirportByCode(fromAirportCode);
         ZoneId fromZoneId = AirportZoneMap.GetTimeZoneByAiport(fromAirport);
-        final ZonedDateTime zonedFromDateTime = ZonedDateTime.of(fromTime, fromZoneId);               
+        final ZonedDateTime zonedFromDateTime = ZonedDateTime.of(fromTime, fromZoneId);
         final LocalDateTime gmtFromDateTime = zonedFromDateTime.withZoneSameInstant(
-            ZoneId.of("GMT")).toLocalDateTime();
+                ZoneId.of("GMT")).toLocalDateTime();
         final ServerInterface.QueryFlightFilter arrivalFilter = (Flight f) -> {
-            if (f == null) return false;
+            if (f == null) {
+                return false;
+            }
+            for (String seatType : seatTypes) {
+                if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
+                    return false;
+                }
+            }
             if (f.getmArrAirport().equals(toAirportCode)) {
                 if (f.getmDepTime().isAfter(gmtFromDateTime)) {
-                   
+                   return true;
                 }
             }
             return false;
         };
-        Flights ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(), 
+        Flights ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(),
                 gmtFromDateTime, arrivalFilter);
         return ret;
     }
-    
+
     private Airport getAirportByCode(String code) {
-        if (airportsCache == null) return null;
+        if (airportsCache == null) {
+            return null;
+        }
         Airport ret = null;
-        for (Airport a: airportsCache) {
+        for (Airport a : airportsCache) {
             if (a.code().equals(code)) {
                 ret = a;
                 break;
@@ -214,10 +339,10 @@ public class FlightInfoController {
         return ret;
     }
     
-    private boolean seatMatch(Flight flight, Airplane airplane, String seattype) {
+    private boolean isSeatAvailable(Flight flight, Airplane airplane, String seattype) {
         boolean availableSeats = false;
 
-        if (seattype.equalsIgnoreCase("coach")) {
+        if (seattype.equalsIgnoreCase(Airplane.COACH)) {
             int mSeatsCoach = flight.getmSeatsCoach();
             int mCoachSeats = airplane.getmCoachSeats();
             int remCoachSeats = mCoachSeats - mSeatsCoach;
@@ -225,7 +350,7 @@ public class FlightInfoController {
                 availableSeats = true;
             }
 
-        } else if (seattype.equalsIgnoreCase("firstclass")) {
+        } else if (seattype.equalsIgnoreCase(Airplane.FIRST)) {
             int mSeatsFirst = flight.getmSeatsFirst();
             int mFirstClassSeats = airplane.getmFirstClassSeats();
             int remFirstClassSeats = mFirstClassSeats - mSeatsFirst;
@@ -236,6 +361,15 @@ public class FlightInfoController {
 
         return availableSeats;
 
+    }
+    
+    public void syncAirplanes() {
+        Airplanes allPlanes = ServerInterface.INSTANCE.getAirplanes(teamName);
+        airplaneCache = new HashMap<>();
+        for (Airplane a: allPlanes) {
+            String model = a.getmModel();
+            airplaneCache.put(model, a);
+        }
     }
 }
 

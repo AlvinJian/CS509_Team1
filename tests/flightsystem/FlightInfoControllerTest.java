@@ -64,7 +64,7 @@ public class FlightInfoControllerTest {
         String toAirportCode = "";
         FlightInfoController.FlightsReceiver receiver = null;
         FlightInfoController instance = new FlightInfoController();
-        instance.searchDirectFlight(fromAirportCode, fromTime, toAirportCode, receiver);
+        //instance.searchDirectFlight(fromAirportCode, fromTime, toAirportCode, receiver);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

@@ -1,5 +1,6 @@
 package flightsystem;
 
+import airplane.Airplane;
 import airport.Airports;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
@@ -588,9 +589,12 @@ public class FlightSystemUI extends javax.swing.JFrame {
             searchButton.setEnabled(true);
             reserveButton.setEnabled(true);
         };
+
         departureCode = ((ComboItem)departureComboBox.getSelectedItem()).getAirportCode();
         arrivalCode = ((ComboItem)arrivalComboBox.getSelectedItem()).getAirportCode();
-        flightInfoController.searchDirectFlight(departureCode, localTime, arrivalCode, receiver);
+        List<String> seatTypes = seatList.getSelectedValuesList();
+        flightInfoController.searchDirectFlight(departureCode, localTime, arrivalCode, seatTypes, receiver);
+
         //Get return flight from arrival -> departure airport
         if (roundtripCheckBox.isSelected())
         {
@@ -612,7 +616,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
                         JOptionPane.WARNING_MESSAGE);
                 }
             };
-            flightInfoController.searchDirectFlight(arrivalCode, localTimeReturn, departureCode, arrivalReceiver);
+            flightInfoController.searchDirectFlight(arrivalCode, localTimeReturn, departureCode, seatTypes, arrivalReceiver);
         }
     }
     private void addFlightToTable(Flights flights, javax.swing.JTable table)
