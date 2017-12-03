@@ -39,7 +39,9 @@ public class Saps {
 	
 	public static final int MIN_SEAT = 0;
 	public static final int MAX_SEAT = Integer.MAX_VALUE;
-	
+        
+        public static final String COACH_TYPE = "Coach";
+        public static final String FIRST_CLASS_TYPE = "FirstClass";
 	
 	
 }

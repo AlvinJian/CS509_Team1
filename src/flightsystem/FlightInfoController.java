@@ -11,7 +11,9 @@ import airport.AirportZoneMap;
 import airport.Airports;
 import dao.ServerInterface;
 import flight.Flight;
+import flight.FlightConfirmation;
 import flight.Flights;
+import flight.ReserveFlight;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -48,7 +50,10 @@ public class FlightInfoController {
     public interface FlightsReceiver {
         public void onReceived(Flights ret);
     }
-    
+    public interface FlightConfirmationReceiver
+    {
+        public void onReceived(FlightConfirmation confirm);
+    }
     public Airports syncAirports() {
         synchronized (serverLck) {
             airportsCache = ServerInterface.INSTANCE.getAirports(teamName);
@@ -56,6 +61,36 @@ public class FlightInfoController {
         return airportsCache;
     }
     
+    public void reserveFlight(ReserveFlight reserveFlightObj, FlightConfirmationReceiver receiver)
+    {
+        String xml = reserveFlightObj.getXML();
+        if ( xml.isEmpty() ){
+            if( receiver != null)
+            {
+                 receiver.onReceived(new FlightConfirmation(false, "Received an empty list of flights"));
+            }
+        }
+        else
+        {
+            //TODO: add thread to loop until database is unlocked
+            ServerInterface.INSTANCE.lock(teamName);
+            Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                FlightConfirmation flightConfirm;
+                synchronized (serverLck) {
+                    
+                }
+                Runnable _r = () -> receiver.onReceived(flightConfirm);
+                SwingUtilities.invokeLater(_r);
+            }
+            };
+            Thread t = new Thread(r);
+            t.start();
+        }
+        
+        
+    }
     public void searchDirectFlight(String fromAirportCode, LocalDateTime fromTime, 
             String toAirportCode, FlightsReceiver receiver) {
         if (airportsCache == null) {
@@ -157,7 +192,7 @@ public class FlightInfoController {
             if (f == null) return false;
             if (f.getmArrAirport().equals(toAirportCode)) {
                 if (f.getmDepTime().isAfter(gmtFromDateTime)) {
-                    return true;
+                   
                 }
             }
             return false;

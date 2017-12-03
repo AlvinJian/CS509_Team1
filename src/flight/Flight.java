@@ -7,6 +7,8 @@ import java.util.Comparator;
 
 import utils.Saps;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class holds values pertaining to a single Flightdep. Class member
@@ -37,6 +39,8 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
 	private int mSeatsFirst; // Number of first class seats already reserved
 	private double mPriceCoach; // Coach price
 	private int mSeatsCoach; // Number of coach seats already reserved
+        private List<String> mSeatTypeAvailable;
+        private double mAvailableSeatPrice;
 	
 
 
@@ -62,6 +66,8 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
 		mSeatsFirst = Integer.MAX_VALUE;
 		mPriceCoach = Double.MAX_VALUE;
 		mSeatsCoach = Integer.MAX_VALUE;
+                mSeatTypeAvailable = new ArrayList<String>();
+                mAvailableSeatPrice = Double.MAX_VALUE; 
 	}
 
 	/**
@@ -251,7 +257,32 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
 		else
 			throw new IllegalArgumentException(Integer.toString(mSeatsCoach));
 	}
-
+        public List<String> getmSeatTypeAvailable()
+        {
+            return mSeatTypeAvailable;
+        }
+        public void setmSeatTypeAvailable(String type)
+        {
+            if(isValidmSeatTypeAvailable(type))
+            {
+                mSeatTypeAvailable.add(type);
+            }
+            else
+                throw new IllegalArgumentException(mSeatTypeAvailable.toString());
+        }
+        public void setmSeatTypeAvailable(ArrayList<String> seatTypes)
+        {
+            for ( String seat: seatTypes)
+            {
+                if(isValidmSeatTypeAvailable(seat))
+                {
+                    mSeatTypeAvailable.add(seat);
+                }
+                else
+                    throw new IllegalArgumentException(mSeatTypeAvailable.toString());
+            }
+          
+        }
 
 	/**
 	 * Compare two airports based on 3 character code
@@ -404,6 +435,11 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
 			return false;
 		return true;
 	}
+        public boolean isValidmSeatTypeAvailable(String type){
+            if ( type.equalsIgnoreCase(Saps.COACH_TYPE) || type.equalsIgnoreCase(Saps.FIRST_CLASS_TYPE)) 
+			return true;
+		return false;
+        }
 
 	@Override
 	public int compare(Flight o1, Flight o2) {
