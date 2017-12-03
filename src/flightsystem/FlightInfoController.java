@@ -66,7 +66,7 @@ public class FlightInfoController {
     }
 
     public void searchDirectFlight(String fromAirportCode, LocalDateTime fromTime,
-            String toAirportCode, FlightsReceiver receiver) {
+            String toAirportCode, List<String> seatTypes, FlightsReceiver receiver) {
         if (airportsCache == null) {
             syncAirports();
         }
@@ -84,12 +84,12 @@ public class FlightInfoController {
             public void run() {
                 Flights ret;
                 synchronized (serverLck) {
-                    ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode);
+                    ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode, seatTypes);
                     controllerLogger.log(logLevel, "flight count={0}", ret.size());
                     directFlightsCache = ret;
                     /* TODO remove this afterward */
-                    List<List<Flight>> testRet = _SearchStopoverFlightsImpl(Airplane.COACH, 
-                            fromAirportCode, fromTime, toAirportCode, 1);
+                    List<List<Flight>> testRet = _SearchStopoverFlightsImpl(fromAirportCode, fromTime, 
+                            toAirportCode, seatTypes, 1);
                     stopOverSearchTest(testRet);
                 }
                 Runnable _r = () -> receiver.onReceived(ret);
@@ -159,8 +159,8 @@ public class FlightInfoController {
     
     List<List<Flight>> _stopoverFlights;
     
-    private List<List<Flight>> _SearchStopoverFlightsImpl(String seatType, String depAirportCode, 
-            LocalDateTime depTime, String arrAirportCode, int stopover) {
+    private List<List<Flight>> _SearchStopoverFlightsImpl(String depAirportCode, 
+            LocalDateTime depTime, String arrAirportCode, List<String> seatTypes, int stopover) {
         Airport depAirport = getAirportByCode(depAirportCode);
         ZoneId depZoneId = AirportZoneMap.GetTimeZoneByAiport(depAirport);
         ZonedDateTime zonedDepDateTime = ZonedDateTime.of(depTime, depZoneId);
@@ -170,8 +170,10 @@ public class FlightInfoController {
             @Override
             public boolean isValid(Flight f) {
                 if (f == null) return false;
-                if (!seatMatch(f, airplaneCache.get(f.getmAirplane()), seatType)) {
-                    return false;
+                for (String seatType: seatTypes) {
+                    if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
+                        return false;
+                    }
                 }
                 if (f.getmDepTime().isAfter(gmtDepDateTime)) {
                     return true;
@@ -189,22 +191,24 @@ public class FlightInfoController {
             LocalDateTime nextDepDateTime = f.getmArrTime();
             List<Flight> history = new ArrayList<>();
             history.add(f);
-            _SearchStopoverFlightsInnr(history, seatType, nextDepAirportCode, nextDepDateTime, 
-                    arrAirportCode, level + 1, stopover);
+            _SearchStopoverFlightsInnr(history, nextDepAirportCode, nextDepDateTime, 
+                    arrAirportCode, seatTypes, level + 1, stopover);
         }
-        // temp
+
         return _stopoverFlights;
     }
     
-    private void _SearchStopoverFlightsInnr(List<Flight> history, String seatType, 
+    private void _SearchStopoverFlightsInnr(List<Flight> history, 
             String depAirportCode, LocalDateTime depTime, String arrAirportCode, 
-            int level, int stopover) {
+            List<String> seatTypes, int level, int stopover) {
         ServerInterface.QueryFlightFilter highLvFilter = new ServerInterface.QueryFlightFilter() {
             @Override
             public boolean isValid(Flight f) {
                 if (f == null) return false;
-                if (!seatMatch(f, airplaneCache.get(f.getmAirplane()), seatType)) {
-                    return false;
+                for (String seatType: seatTypes) {
+                    if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
+                        return false;
+                    }
                 }
                 long diff = hourSubstract(depTime, f.getmDepTime());
                 if ((diff >= 30 && diff <= 240) && !isInDfsHistory(history, f)) {
@@ -226,14 +230,14 @@ public class FlightInfoController {
             } else {
                 String nextDepAirportCode = f.getmArrAirport();
                 LocalDateTime nextDepDateTime = f.getmArrTime();
-                _SearchStopoverFlightsInnr(newHistory, seatType, nextDepAirportCode, nextDepDateTime, 
-                    arrAirportCode, level + 1, stopover);
+                _SearchStopoverFlightsInnr(newHistory, nextDepAirportCode, nextDepDateTime, 
+                    arrAirportCode, seatTypes, level + 1, stopover);
             }
         }
     }
 
     private Flights SearchFlightsImpl(String fromAirportCode, LocalDateTime fromTime,
-            String toAirportCode) {
+            String toAirportCode, List<String> seatTypes) {
         final Airport fromAirport = getAirportByCode(fromAirportCode);
         ZoneId fromZoneId = AirportZoneMap.GetTimeZoneByAiport(fromAirport);
         final ZonedDateTime zonedFromDateTime = ZonedDateTime.of(fromTime, fromZoneId);
@@ -242,6 +246,11 @@ public class FlightInfoController {
         final ServerInterface.QueryFlightFilter arrivalFilter = (Flight f) -> {
             if (f == null) {
                 return false;
+            }
+            for (String seatType : seatTypes) {
+                if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
+                    return false;
+                }
             }
             if (f.getmArrAirport().equals(toAirportCode)) {
                 if (f.getmDepTime().isAfter(gmtFromDateTime)) {
@@ -269,7 +278,7 @@ public class FlightInfoController {
         return ret;
     }
     
-    private boolean seatMatch(Flight flight, Airplane airplane, String seattype) {
+    private boolean isSeatAvailable(Flight flight, Airplane airplane, String seattype) {
         boolean availableSeats = false;
 
         if (seattype.equalsIgnoreCase(Airplane.COACH)) {
