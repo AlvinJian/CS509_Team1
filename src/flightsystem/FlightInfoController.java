@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -84,18 +85,34 @@ public class FlightInfoController {
         }
         else
         {
-            //TODO: add thread to loop until database is unlocked
-            ServerInterface.INSTANCE.lock(teamName);
-            Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                FlightConfirmation flightConfirm;
-                synchronized (serverLck) {
-                    
+            final FlightConfirmation flightConfirm = new FlightConfirmation(false, "");
+//            flightConfirm = new FlightConfirmation(false, "");
+            Timer timer = new Timer();
+            timer.schedule(new java.util.TimerTask() {
+                @Override
+                public void run() {
+                    Runnable _r = () -> receiver.onReceived(flightConfirm);
+                    SwingUtilities.invokeLater(_r);
+//                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
                 }
-                //Runnable _r = () -> receiver.onReceived(flightConfirm);
-                //SwingUtilities.invokeLater(_r);
-            }
+
+            }, 30000);
+            //TODO: add thread to loop until database is unlocked
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (serverLck) {
+                        boolean isGetLock = ServerInterface.INSTANCE.lock(teamName);
+                        while (!isGetLock) {
+                            isGetLock = ServerInterface.INSTANCE.lock(teamName);
+                        }
+                        ServerInterface.INSTANCE.reserveSeat(teamName, reserveFlightObj);
+                        ServerInterface.INSTANCE.unlock(teamName);
+                        final FlightConfirmation flightConfirm = new FlightConfirmation(true, "");
+                    }
+                    Runnable _r = () -> receiver.onReceived(flightConfirm);
+                    SwingUtilities.invokeLater(_r);
+                }
             };
             Thread t = new Thread(r);
             t.start();
@@ -323,6 +340,28 @@ public class FlightInfoController {
         return ret;
     }
 
+    private void copyFlightList(List<List<Flight>> result, List<Flight> flights, List<Flight> original, int stopover, int index) {
+        if(flights.size() == 0 || flights == null || index == stopover + 1) 
+            return;
+        List<String> seatTypes;
+        Flight f = original.get(index);
+        index++;
+        if(f.getmSeatTypeAvailable().size() <= 1) {
+            copyFlightList(result, flights, original, stopover, index);
+        } else {
+            List<Flight> copy = new ArrayList<>(flights);
+            List<String> coach = new ArrayList<>();
+            coach.add(Airplane.COACH);
+            copy.get(index).setmSeatTypeAvailable(coach);
+            copyFlightList(result, copy, original, stopover, index);
+            List<String> first = new ArrayList<>();
+            coach.add(Airplane.FIRST);
+            flights.get(index).setmSeatTypeAvailable(first);
+            copyFlightList(result, flights, original, stopover, index);
+        }
+        
+    }
+    
     private Airport getAirportByCode(String code) {
         if (airportsCache == null) {
             return null;
