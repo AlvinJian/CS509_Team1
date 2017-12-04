@@ -285,6 +285,11 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
           
         }
 
+        public void replacemSeatTypeAvailable(List<String> seatTypes)
+        {
+            mSeatTypeAvailable = seatTypes;
+        }
+        
 	/**
 	 * Compare two airports based on 3 character code
 	 * 

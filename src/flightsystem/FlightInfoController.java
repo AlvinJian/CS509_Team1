@@ -304,7 +304,14 @@ public class FlightInfoController {
             newHistory.add(f);
             if (newHistory.size() == stopover+1) {
                 if (f.getmArrAirport().equals(arrAirportCode)) {
-                    _stopoverFlights.add(newHistory);
+                    convertToAirportTime(newHistory);
+                    List<List<Flight>> ret = new ArrayList<>();
+                    copyFlightList(ret, newHistory, newHistory, stopover, 0);
+                    for (List<Flight> r: ret) {
+                        copyFlightListTest(r);
+                        _stopoverFlights.add(r);
+                    }
+//                    _stopoverFlights.add(newHistory);
                 }
             } else {
                 String nextDepAirportCode = f.getmArrAirport();
@@ -341,10 +348,27 @@ public class FlightInfoController {
                 gmtFromDateTime, arrivalFilter);
         return ret;
     }
+    
+    private void copyFlightListTest(List<Flight> fs) {
+        Level level = Level.INFO;
+        StringBuilder builder = new StringBuilder();
+        for (Flight f: fs) {
+            builder.append(String.format("departCode=%s ", f.getmDepAirport()));
+            builder.append(String.format("departTime=%s ", f.getmDepTime().toString()));
+            builder.append(String.format("arrCode=%s ", f.getmArrAirport()));
+            builder.append(String.format("arrTime=%s ", f.getmArrTime().toString()));
+            builder.append(String.format("seat_type=%s", 
+                    f.getmSeatTypeAvailable().toString()));
+        }
+        controllerLogger.log(level, builder.toString());
+    }
 
     private void copyFlightList(List<List<Flight>> result, List<Flight> flights, List<Flight> original, int stopover, int index) {
-        if(flights.size() == 0 || flights == null || index == stopover + 1) 
+        if(flights.size() == 0 || flights == null || index < stopover + 1) {
+            result.add(new ArrayList<>(flights));
             return;
+        }
+            
         List<String> seatTypes;
         Flight f = original.get(index);
         index++;
@@ -354,11 +378,11 @@ public class FlightInfoController {
             List<Flight> copy = new ArrayList<>(flights);
             List<String> coach = new ArrayList<>();
             coach.add(Airplane.COACH);
-            copy.get(index).setmSeatTypeAvailable(coach);
+            copy.get(index).replacemSeatTypeAvailable(coach);
             copyFlightList(result, copy, original, stopover, index);
             List<String> first = new ArrayList<>();
             coach.add(Airplane.FIRST);
-            flights.get(index).setmSeatTypeAvailable(first);
+            flights.get(index).replacemSeatTypeAvailable(first);
             copyFlightList(result, flights, original, stopover, index);
         }
         
