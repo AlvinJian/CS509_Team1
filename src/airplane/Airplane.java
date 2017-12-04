@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 public class Airplane implements Comparable<Airplane>, Comparator<Airplane> {
     
-    public static String COACH = "coach";
-    public static String FIRST = "firstclass";
+    public static String COACH = "Coach";
+    public static String FIRST = "FirstClass";
     
 	private String mManufacturer; // Full name of the airport
 	private String mModel; // Three character code of the airport

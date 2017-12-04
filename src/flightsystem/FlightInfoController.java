@@ -76,6 +76,7 @@ public class FlightInfoController {
     
     public void reserveFlight(ReserveFlight reserveFlightObj, FlightConfirmationReceiver receiver)
     {
+        System.out.println(reserveFlightObj.getXML());
         String xml = reserveFlightObj.getXML();
         if ( xml.isEmpty() ){
             if( receiver != null)
@@ -85,8 +86,7 @@ public class FlightInfoController {
         }
         else
         {
-            final FlightConfirmation flightConfirm = new FlightConfirmation(false, "");
-//            flightConfirm = new FlightConfirmation(false, "");
+            final FlightConfirmation flightConfirm = new FlightConfirmation(false, "timeout");
             Timer timer = new Timer();
             timer.schedule(new java.util.TimerTask() {
                 @Override
@@ -108,8 +108,8 @@ public class FlightInfoController {
                         }
                         ServerInterface.INSTANCE.reserveSeat(teamName, reserveFlightObj);
                         ServerInterface.INSTANCE.unlock(teamName);
-                        final FlightConfirmation flightConfirm = new FlightConfirmation(true, "");
                     }
+                    final FlightConfirmation flightConfirm = new FlightConfirmation(true, "");
                     Runnable _r = () -> receiver.onReceived(flightConfirm);
                     SwingUtilities.invokeLater(_r);
                 }

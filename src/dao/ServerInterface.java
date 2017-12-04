@@ -326,8 +326,8 @@ public enum ServerInterface {
         
         
         public boolean reserveSeat(String teamName, ReserveFlight reserveFlightObj) {
-        		URL url;
-		HttpURLConnection connection;
+            URL url;
+            HttpURLConnection connection;
 		
 		try {
 			url = new URL(mUrlBase);
@@ -335,7 +335,7 @@ public enum ServerInterface {
 			connection.setRequestMethod("POST");
 			
 			String params = QueryFactory.reserveSeat(teamName);
-			
+                        
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
 			
