@@ -201,6 +201,8 @@ public class FlightSystemUI extends javax.swing.JFrame {
         seatList = new javax.swing.JList<>();
         jLabel8 = new javax.swing.JLabel();
         layoverComboxBox = new javax.swing.JComboBox<>();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -216,9 +218,9 @@ public class FlightSystemUI extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setText("Departure");
+        jLabel2.setText("Departure Airport:");
 
-        jLabel3.setText("Arrival");
+        jLabel3.setText("Arrival Airport:");
 
         searchButton.setText("Search For Flight");
         searchButton.addActionListener(new java.awt.event.ActionListener() {
@@ -330,6 +332,10 @@ public class FlightSystemUI extends javax.swing.JFrame {
 
         layoverComboxBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Direct", "1", "2" }));
 
+        jLabel7.setText("Layover:");
+
+        jLabel9.setText("Seat Type:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -337,7 +343,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(144, 144, 144)
                 .addComponent(jLabel2)
-                .addGap(195, 195, 195)
+                .addGap(114, 114, 114)
                 .addComponent(jLabel3)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
@@ -346,7 +352,9 @@ public class FlightSystemUI extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                             .addGap(277, 277, 277)
-                            .addComponent(searchButton))
+                            .addComponent(searchButton)
+                            .addGap(32, 32, 32)
+                            .addComponent(roundtripCheckBox))
                         .addGroup(layout.createSequentialGroup()
                             .addGap(169, 169, 169)
                             .addComponent(jLabel8)
@@ -373,8 +381,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
                                     .addComponent(departureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(7, 7, 7)
                                     .addComponent(arrivalComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(66, 66, 66)
-                                    .addComponent(layoverComboxBox, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGap(153, 153, 153))
                                 .addGroup(layout.createSequentialGroup()
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
@@ -387,10 +394,14 @@ public class FlightSystemUI extends javax.swing.JFrame {
                                             .addGap(34, 34, 34)
                                             .addComponent(jLabel6))
                                         .addComponent(dateTimePickerReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGap(18, 18, 18)
+                            .addGap(77, 77, 77)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(seatTable, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(roundtripCheckBox)))
+                                .addComponent(jLabel9)
+                                .addComponent(seatTable, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(22, 22, 22)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(layoverComboxBox, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel7)))
                         .addGroup(layout.createSequentialGroup()
                             .addGap(33, 33, 33)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 1103, javax.swing.GroupLayout.PREFERRED_SIZE))))
@@ -400,20 +411,23 @@ public class FlightSystemUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(24, 24, 24)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addGap(13, 13, 13))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel7))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(13, 13, 13)
-                                .addComponent(departureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(13, 13, 13)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(arrivalComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(layoverComboxBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(departureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(arrivalComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(layoverComboxBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(21, 21, 21)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -424,13 +438,11 @@ public class FlightSystemUI extends javax.swing.JFrame {
                                 .addComponent(jLabel6)
                                 .addGap(0, 0, 0)
                                 .addComponent(dateTimePickerReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(13, 13, 13)
-                        .addComponent(seatTable, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(roundtripCheckBox)))
+                    .addComponent(seatTable, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(38, 38, 38)
-                .addComponent(searchButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(searchButton)
+                    .addComponent(roundtripCheckBox))
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(departureLabelOut, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -536,7 +548,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
             //Get one way flight from departure -> arrival airport
             if ( layoverComboxBox.getSelectedItem().toString().equalsIgnoreCase("direct"))
             {
-                getFlights();
+                getDirectFlights();
             }
             else
             {
@@ -559,7 +571,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_searchButtonActionPerformed
-    private void getFlights()
+    private void getDirectFlights()
     {
         //Flights depFlights = ServerInterface.INSTANCE.getFlights("CS509team1", departureCode, localTime, ServerInterface.QueryFlightType.DEPART, getFilter(arrivalCode));
         FlightInfoController.FlightsReceiver receiver = (Flights depFlights) -> {
@@ -574,9 +586,13 @@ public class FlightSystemUI extends javax.swing.JFrame {
                         "Flight Availability Warning",
                         JOptionPane.WARNING_MESSAGE);
             }
-            roundtripCheckBox.setEnabled(true);
-            searchButton.setEnabled(true);
-            reserveButton.setEnabled(true);
+            if( !roundtripCheckBox.isSelected())
+            {
+                roundtripCheckBox.setEnabled(true);
+                searchButton.setEnabled(true);
+                reserveButton.setEnabled(true);
+            }
+            
         };
 
         departureCode = ((ComboItem)departureComboBox.getSelectedItem()).getAirportCode();
@@ -604,6 +620,9 @@ public class FlightSystemUI extends javax.swing.JFrame {
                         "Flight Availability Warning",
                         JOptionPane.WARNING_MESSAGE);
                 }
+                roundtripCheckBox.setEnabled(true);
+                searchButton.setEnabled(true);
+                reserveButton.setEnabled(true);
             };
             flightInfoController.searchDirectFlight(arrivalCode, localTimeReturn, departureCode, seatTypes, arrivalReceiver);
         }
@@ -611,90 +630,105 @@ public class FlightSystemUI extends javax.swing.JFrame {
     private void getLayOverFlights()
     {
         FlightInfoController.StopoverFlightsReceiver receiver = (List<List<Flight>> depFlights) -> {
-            if (depFlights.size() > 0) {
+        if (depFlights.size() > 0) {
                 flightSystemUILogger.log(Level.INFO, "Adding departure->arrival flights info to table");
                 departureLabelOut.setText(departureCode);
                 arrivalLabelOut.setText(arrivalCode);
-                DefaultTableModel model = new DefaultTableModel();
-                for( List<Flight>flightsForLeg: depFlights)
-                {
-                    List<String>flightNumbers = new ArrayList<>();
-                    List<String>departureAirport = new ArrayList<>();
-                    List<String>deaprtureTime = new ArrayList<>();
-                    List<String>arrivalAirports = new ArrayList<>();
-                    List<String>arrivalTimes = new ArrayList<>();
-                    int flightTime = 0;
-                    List<String>seatTypes = new ArrayList<>();
-                    double totalPrice = 0.0; 
-                    TableItems tableItems = new TableItems();
-                    int numberOfLayovers = flightsForLeg.size() - 1;
-                    for ( Flight f: flightsForLeg)
-                    {
-                        tableItems.flightNumberClass.addFlightNumber(f.getmNumber());
-                        
-                        departureAirport.add(f.getmDepAirport());
-                        deaprtureTime.add(f.getmDepTime().toString());
-                        arrivalAirports.add(f.getmArrAirport());
-                        arrivalTimes.add(f.getmArrTime().toString());
-                        flightTime = f.getmFlightTime();
-                        seatTypes = f.getmSeatTypeAvailable();
-                        for (String type: seatTypes )
-                        {
-                            
-                            if (type.equalsIgnoreCase(Airplane.COACH)) 
-                            {
-                                tableItems.flightNumberClass.addFlightNumberAndSeatType(f.getmNumber(), Airplane.COACH);
-                                tableItems.departureArrivalClass.addDepartureArrival( f.getmDepAirport(), f.getmArrAirport(),Airplane.COACH );
-                                totalPrice += f.getmPriceCoach();
-                            }
-                            else if ( type.equalsIgnoreCase(Airplane.FIRST))
-                            {
-                                tableItems.flightNumberClass.addFlightNumberAndSeatType(f.getmNumber(), Airplane.FIRST);
-                                tableItems.departureArrivalClass.addDepartureArrival( f.getmDepAirport(), f.getmArrAirport(), Airplane.FIRST );
-                                totalPrice += f.getmPriceFirst();
-                            }
-                        }
-                                                
-                    }
-                    
-                    
-                    model.setColumnIdentifiers(new String [] {
-                        "Flight #", "Departure->Arrival", "Departure Time", "Arrival Time", "Flight Time", "Total Price", "# of Layovers"
-                    });
-                    model.addRow(new Object[]{
-                        tableItems.flightNumberClass,
-                        tableItems.departureArrivalClass,
-                        deaprtureTime,
-                        arrivalTimes,
-                        flightTime,
-                        totalPrice,
-                        numberOfLayovers,
-                    });
-                    
-                    departureTable.setModel(model);
-                }
-
-               
+                addFlightToTable(depFlights, departureTable);
             } else {
                 JOptionPane.showMessageDialog(null,
                         "No flights available for this combination",
                         "Flight Availability Warning",
                         JOptionPane.WARNING_MESSAGE);
             }
-            roundtripCheckBox.setEnabled(true);
-            searchButton.setEnabled(true);
-            reserveButton.setEnabled(true);
+            if (!roundtripCheckBox.isSelected())
+            {
+                roundtripCheckBox.setEnabled(true);
+                searchButton.setEnabled(true);
+                reserveButton.setEnabled(true);
+            }
         };
         departureCode = ((ComboItem)departureComboBox.getSelectedItem()).getAirportCode();
         arrivalCode = ((ComboItem)arrivalComboBox.getSelectedItem()).getAirportCode();
         List<String> seatTypes = seatList.getSelectedValuesList();
         int layover = Integer.parseInt( layoverComboxBox.getSelectedItem().toString());
         flightInfoController.searchStopoverFlights(departureCode, localTime, arrivalCode, seatTypes, layover, receiver);
+        if (roundtripCheckBox.isSelected())
+        {
+            flightSystemUILogger.log(Level.INFO,"Getting return flights");
+            FlightInfoController.StopoverFlightsReceiver returnFlightsReceiver = (List<List<Flight>> depFlights) -> {
+            if (depFlights.size() > 0) {
+                flightSystemUILogger.log(Level.INFO, "Adding arrival->departure flights info to table");
+                departureLabelOut.setText(departureCode);
+                arrivalLabelOut.setText(arrivalCode);
+                addFlightToTable(depFlights, arrivalTable);
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "No flights available for this combination",
+                        "Flight Availability Warning",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+                roundtripCheckBox.setEnabled(true);
+                searchButton.setEnabled(true);
+                reserveButton.setEnabled(true);
+            };
+            flightInfoController.searchStopoverFlights(arrivalCode, localTimeReturn, departureCode, seatTypes, layover, returnFlightsReceiver);
+        }
+        
         roundtripCheckBox.setEnabled(false);
         searchButton.setEnabled(false);
         reserveButton.setEnabled(false);
     }
-    
+    private void addFlightToTable(List<List<Flight>> flights, javax.swing.JTable table)
+    {
+        DefaultTableModel model = new DefaultTableModel();
+        for (List<Flight> flightsForLeg : flights) {
+            List<String> departureAirport = new ArrayList<>();
+            List<String> deaprtureTime = new ArrayList<>();
+            List<String> arrivalAirports = new ArrayList<>();
+            List<String> arrivalTimes = new ArrayList<>();
+            int flightTime = 0;
+            List<String> seatTypes = new ArrayList<>();
+            double totalPrice = 0.0;
+            TableItems tableItems = new TableItems();
+            int numberOfLayovers = flightsForLeg.size() - 1;
+            for (Flight f : flightsForLeg) {
+                tableItems.flightNumberClass.addFlightNumber(f.getmNumber());
+                departureAirport.add(f.getmDepAirport());
+                deaprtureTime.add(f.getmDepTime().toString());
+                arrivalAirports.add(f.getmArrAirport());
+                arrivalTimes.add(f.getmArrTime().toString());
+                flightTime = f.getmFlightTime();
+                seatTypes = f.getmSeatTypeAvailable();
+                for (String type : seatTypes) {
+
+                    if (type.equalsIgnoreCase(Airplane.COACH)) {
+                        tableItems.flightNumberClass.addFlightNumberAndSeatType(f.getmNumber(), Airplane.COACH);
+                        tableItems.departureArrivalClass.addDepartureArrival(f.getmDepAirport(), f.getmArrAirport(), Airplane.COACH);
+                        totalPrice += f.getmPriceCoach();
+                    } else if (type.equalsIgnoreCase(Airplane.FIRST)) {
+                        tableItems.flightNumberClass.addFlightNumberAndSeatType(f.getmNumber(), Airplane.FIRST);
+                        tableItems.departureArrivalClass.addDepartureArrival(f.getmDepAirport(), f.getmArrAirport(), Airplane.FIRST);
+                        totalPrice += f.getmPriceFirst();
+                    }
+                }
+
+            }
+
+            model.setColumnIdentifiers(new String[]{
+                "Flight #", "Departure->Arrival", "Departure Time", "Arrival Time", "Flight Time", "Total Price", "# of Layovers"
+            });
+            model.addRow(new Object[]{
+                tableItems.flightNumberClass,
+                tableItems.departureArrivalClass,
+                deaprtureTime,
+                arrivalTimes,
+                flightTime,
+                totalPrice,
+                numberOfLayovers,});
+            table.setModel(model);
+        }
+    }
     private void addFlightToTable(Flights flights, javax.swing.JTable table)
     {
             DefaultTableModel model = new DefaultTableModel();
@@ -737,7 +771,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
     }//GEN-LAST:event_roundtripCheckBoxActionPerformed
 
     private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
-        // TODO add your handling code here:
+
         FlightInfoController.FlightConfirmationReceiver receiver = (FlightConfirmation flightConfirmation) -> {
             if (flightConfirmation.getConfirmed() )
             {
@@ -777,9 +811,21 @@ public class FlightSystemUI extends javax.swing.JFrame {
             });
             if( roundtripCheckBox.isSelected() )
             {
-                int arrivalRowIndex = arrivalTable.getSelectedRow();
-                if (arrivalRowIndex >= 0)
+                
+                int[] arrivalRowIndex = arrivalTable.getSelectedRows();
+                if (arrivalRowIndex.length == 1)
                 {
+                    FlightNumber returnNumberObj = (FlightNumber)arrivalTable.getModel().getValueAt(rowIndex, column);
+                    if( returnNumberObj == null)
+                    {
+                        JOptionPane.showMessageDialog(null,
+                        "Return flight selected is invalid. Make sure the table is not empty!",
+                        "Reservation Error",
+                        JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    returnNumberObj.getFlightNumberAndSeatType().entrySet().forEach((entry) -> {
+                    flightReser.addSeat(entry.getKey(), entry.getValue()); });
                     flightInfoController.reserveFlight(flightReser, receiver);
                 }
                 else
@@ -867,7 +913,9 @@ public class FlightSystemUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
