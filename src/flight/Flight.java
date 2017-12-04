@@ -66,7 +66,7 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
 		mSeatsFirst = Integer.MAX_VALUE;
 		mPriceCoach = Double.MAX_VALUE;
 		mSeatsCoach = Integer.MAX_VALUE;
-                mSeatTypeAvailable = new ArrayList<String>();
+                mSeatTypeAvailable = new ArrayList<>();
                 mAvailableSeatPrice = Double.MAX_VALUE; 
 	}
 
@@ -130,6 +130,7 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
 		this.mSeatsFirst = mSeatsFirst;
 		this.mPriceCoach = mPriceCoach;
 		this.mSeatsCoach = mSeatsCoach;
+                this.mSeatTypeAvailable = new ArrayList<>();
 	}
 
 

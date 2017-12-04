@@ -251,6 +251,7 @@ public class FlightInfoController {
                 if (f == null) return false;
                 if (!isAnySeatTypeAvailable(f, seatTypes)) {
                     return false;
+
                 }
                 if (f.getmDepTime().isAfter(gmtDepDateTime)) {
                     f.setmSeatTypeAvailable(seatTypes);
@@ -285,6 +286,7 @@ public class FlightInfoController {
                 if (f == null) return false;
                 if (!isAnySeatTypeAvailable(f, seatTypes)) {
                     return false;
+
                 }
                 long diff = DurationMins(depTime, f.getmDepTime());
                 if ((diff >= 30 && diff <= 240) && !isInDfsHistory(history, f)) {
