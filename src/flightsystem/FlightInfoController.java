@@ -307,10 +307,8 @@ public class FlightInfoController {
             if (f == null) {
                 return false;
             }
-            for (String seatType : seatTypes) {
-                if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
-                    return false;
-                }
+            if (!isAnySeatTypeAvailable(f, seatTypes)) {
+                return false;
             }
             if (f.getmArrAirport().equals(toAirportCode)) {
                 if (f.getmDepTime().isAfter(gmtFromDateTime)) {
