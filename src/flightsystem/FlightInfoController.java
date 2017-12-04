@@ -49,7 +49,6 @@ public class FlightInfoController {
     private Flights directFlightsCache;
     private Airports airportsCache;
     private Map<String, Airplane> airplaneCache;
-    private List<ArrayList<Flight>> stopoverFlights = new ArrayList<>();
 
     public FlightInfoController() {
         syncAirplanes();
@@ -135,7 +134,7 @@ public class FlightInfoController {
         t.start();
     }
     
-    public void SearchStopoverFlights(String depAirportCode, LocalDateTime depTime, 
+    public void searchStopoverFlights(String depAirportCode, LocalDateTime depTime, 
             String arrAirportCode, List<String> seatTypes, int stopover, 
             StopoverFlightsReceiver receiver) {
         if (depAirportCode == null || depTime == null || arrAirportCode == null ||
@@ -150,7 +149,7 @@ public class FlightInfoController {
         Runnable r = () -> {
             List<List<Flight>> ret;
             synchronized (serverLck) {
-                ret = _SearchStopoverFlightsImpl(depAirportCode, depTime, 
+                ret = searchStopoverFlightsImpl(depAirportCode, depTime, 
                         arrAirportCode, seatTypes, stopover);
             }
             controllerLogger.log(logLevel, "flight count={0}", ret.size());
@@ -204,23 +203,13 @@ public class FlightInfoController {
     }
 
     // t2 - t1
-    private static long hourSubstract(LocalDateTime t1, LocalDateTime t2) {
-        int h2 = t2.getHour();
-        int h1 = t1.getHour();
-        LocalDate d2 = t2.toLocalDate();
-        LocalDate d1 = t1.toLocalDate();
-        if ( t1.getDayOfMonth() != t2.getDayOfMonth())
-        {
-            controllerLogger.log(Level.INFO, "FOUND ROLLOVER DATE ***");
-            controllerLogger.log(Level.INFO, "*********" + Duration.between(t1, t2).toMinutes());
-        }
-
+    private static long DurationMins(LocalDateTime t1, LocalDateTime t2) {
         return Duration.between(t1, t2).toMinutes();
     }
     
     private List<List<Flight>> _stopoverFlights;
     
-    private List<List<Flight>> _SearchStopoverFlightsImpl(String depAirportCode, 
+    private List<List<Flight>> searchStopoverFlightsImpl(String depAirportCode, 
             LocalDateTime depTime, String arrAirportCode, List<String> seatTypes, int stopover) {
         Airport depAirport = getAirportByCode(depAirportCode);
         ZoneId depZoneId = AirportZoneMap.GetTimeZoneByAiport(depAirport);
@@ -252,14 +241,14 @@ public class FlightInfoController {
             LocalDateTime nextDepDateTime = f.getmArrTime();
             List<Flight> history = new ArrayList<>();
             history.add(f);
-            _SearchStopoverFlightsInnr(history, nextDepAirportCode, nextDepDateTime, 
+            searchStopoverFlightsInner(history, nextDepAirportCode, nextDepDateTime, 
                     arrAirportCode, seatTypes, level + 1, stopover);
         }
 
         return _stopoverFlights;
     }
     
-    private void _SearchStopoverFlightsInnr(List<Flight> history, 
+    private void searchStopoverFlightsInner(List<Flight> history, 
             String depAirportCode, LocalDateTime depTime, String arrAirportCode, 
             List<String> seatTypes, int level, int stopover) {
         ServerInterface.QueryFlightFilter highLvFilter = new ServerInterface.QueryFlightFilter() {
@@ -271,7 +260,7 @@ public class FlightInfoController {
                         return false;
                     }
                 }
-                long diff = hourSubstract(depTime, f.getmDepTime());
+                long diff = DurationMins(depTime, f.getmDepTime());
                 if ((diff >= 30 && diff <= 240) && !isInDfsHistory(history, f)) {
                     return true;
                 } else {
@@ -291,7 +280,7 @@ public class FlightInfoController {
             } else {
                 String nextDepAirportCode = f.getmArrAirport();
                 LocalDateTime nextDepDateTime = f.getmArrTime();
-                _SearchStopoverFlightsInnr(newHistory, nextDepAirportCode, nextDepDateTime, 
+                searchStopoverFlightsInner(newHistory, nextDepAirportCode, nextDepDateTime, 
                     arrAirportCode, seatTypes, level + 1, stopover);
             }
         }
