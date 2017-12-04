@@ -76,7 +76,6 @@ public class FlightInfoController {
     
     public void reserveFlight(ReserveFlight reserveFlightObj, FlightConfirmationReceiver receiver)
     {
-        System.out.println(reserveFlightObj.getXML());
         String xml = reserveFlightObj.getXML();
         if ( xml.isEmpty() ){
             if( receiver != null)
@@ -106,6 +105,7 @@ public class FlightInfoController {
                         while (!isGetLock) {
                             isGetLock = ServerInterface.INSTANCE.lock(teamName);
                         }
+                        timer.cancel();
                         ServerInterface.INSTANCE.reserveSeat(teamName, reserveFlightObj);
                         ServerInterface.INSTANCE.unlock(teamName);
                     }
