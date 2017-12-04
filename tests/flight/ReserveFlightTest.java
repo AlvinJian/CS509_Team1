@@ -5,12 +5,21 @@
  */
 package flight;
 
+import java.io.File;
+import java.io.IOException;
+//import javax.swing.text.Document;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -72,10 +81,45 @@ public class ReserveFlightTest {
         instance.addSeat("123", "Coach");
         instance.addSeat("345", "Coach");
 
-        String expResult = "";
+        String expResult = "<Flights>\n"
+                 + "<Flight number=\"123\" seating=\"Coach\"/>\n"
+                 + "<Flight number=\"345\" seating=\"Coach\"/>\n"
+                 + "</Flights>";
         String result = instance.getXML();
-        assert (expResult != result);
+        assert (expResult.equals(result));
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
+    }
+    
+    public static void stringToDom(String xmlSource)
+            throws IOException {
+        try (java.io.FileWriter fw = new java.io.FileWriter("flight.xml")) {
+            fw.write(xmlSource);
+        }
+    }
+    
+     @Test
+    public void testGetXMLFormat() throws IOException, ParserConfigurationException, SAXException  {
+        System.out.println("GetXMLFormat");
+        ReserveFlight instance = new ReserveFlight();
+        instance.addSeat("123", "Coach");
+        instance.addSeat("345", "Coach");
+
+        String result = instance.getXML();
+        
+        stringToDom(result);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(true);
+
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        // the "parse" method also validates XML, will throw an exception if misformatted
+        Document document = builder.parse(new InputSource("flight.xml"));
+        
+       
+      
+
+      
     }
 }

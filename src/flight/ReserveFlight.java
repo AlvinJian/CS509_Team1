@@ -40,8 +40,8 @@ public class ReserveFlight {
         for (Map.Entry<String, String> pair : seatMap.entrySet()) {
             String flightNumber = pair.getKey();
             String seatType = pair.getValue();
-            token += "<Flight number=" + flightNumber + " seating="
-                    + seatType + "/>\n";
+            token += "<Flight number=\"" + flightNumber + "\" seating=\""
+                    + seatType + "\"/>\n";
 
         }
         String xmlData =   head + token + end;

@@ -5,6 +5,7 @@
  */
 package airport;
 
+import java.net.MalformedURLException;
 import java.time.ZoneId;
 import org.json.*;
 
@@ -31,11 +32,9 @@ public static ZoneId GetTimeZoneByAiport(Airport airport) {
             String outID = timezoneobj.getString("timeZoneId");
             ZoneId ret = ZoneId.of(outID);
             return ret;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (InterruptedException | MalformedURLException | JSONException e) {
             return ZoneId.systemDefault();
         }    
-        // TODO this is dummy.
 
     }
 }
