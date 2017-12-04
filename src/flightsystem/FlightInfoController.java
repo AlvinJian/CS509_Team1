@@ -411,7 +411,36 @@ public class FlightInfoController {
         }
     }
     
-    
+     public void convertToAirportTime(List<Flight> flights) {
+            String mDepAirport;
+            LocalDateTime mDepTime;
+            String mArrAirport;
+            LocalDateTime mArrTime;
+            
+            for (Flight flight : flights) {
+             mDepAirport = flight.getmDepAirport();
+             mDepTime = flight.getmDepTime();
+             mArrAirport = flight.getmArrAirport();
+             mArrTime = flight.getmArrTime();
+
+             //Airportcode -> Airport
+             Airport depAirport = getAirportByCode(mDepAirport);
+             Airport arrAirport = getAirportByCode(mArrAirport);
+
+             ZoneId zoneDep = AirportZoneMap.GetTimeZoneByAiport(depAirport);
+             ZoneId zoneArr = AirportZoneMap.GetTimeZoneByAiport(arrAirport);
+             ZoneId gmtZone = ZoneId.of("GMT");
+
+             ZonedDateTime gmtDepTime = ZonedDateTime.of(mDepTime, gmtZone);
+             flight.setmDepTime(gmtDepTime.withZoneSameInstant(zoneDep).toLocalDateTime());
+
+             ZonedDateTime gmtArrTime = ZonedDateTime.of(mArrTime, gmtZone);
+             flight.setmArrTime(gmtArrTime.withZoneSameInstant(zoneDep).toLocalDateTime());
+
+            }
+            
+            
+        }
 }
 
 

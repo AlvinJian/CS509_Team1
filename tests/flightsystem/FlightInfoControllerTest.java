@@ -12,6 +12,10 @@ import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import flight.Flight;
+import flight.ReserveFlight;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -54,10 +58,10 @@ public class FlightInfoControllerTest {
         System.out.println("syncAirports");
         FlightInfoController instance = new FlightInfoController();
         Airports expResult = null;
-//        Airports result = instance.syncAirports();
+        Airports result = instance.syncAirports();
 //        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -74,7 +78,64 @@ public class FlightInfoControllerTest {
         FlightInfoController instance = new FlightInfoController();
         //instance.searchDirectFlight(fromAirportCode, fromTime, toAirportCode, receiver);
         // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of reserveFlight method, of class FlightInfoController.
+     */
+    @Test
+    public void testReserveFlight() {
+        System.out.println("reserveFlight");
+        ReserveFlight reserveFlightObj = null;
+        FlightInfoController.FlightConfirmationReceiver receiver = null;
+        FlightInfoController instance = new FlightInfoController();
+        instance.reserveFlight(reserveFlightObj, receiver);
+        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of SearchStopoverFlights method, of class FlightInfoController.
+     */
+    @Test
+    public void testSearchStopoverFlights() {
+        System.out.println("SearchStopoverFlights");
+        String depAirportCode = "";
+        LocalDateTime depTime = null;
+        String arrAirportCode = "";
+        List<String> seatTypes = null;
+        int stopover = 0;
+        FlightInfoController.StopoverFlightsReceiver receiver = null;
+        FlightInfoController instance = new FlightInfoController();
+        instance.SearchStopoverFlights(depAirportCode, depTime, arrAirportCode, seatTypes, stopover, receiver);
+        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of syncAirplanes method, of class FlightInfoController.
+     */
+    @Test
+    public void testSyncAirplanes() {
+        System.out.println("syncAirplanes");
+        FlightInfoController instance = new FlightInfoController();
+        instance.syncAirplanes();
+        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of convertToAirportTime method, of class FlightInfoController.
+     */
+    @Test
+    public void testConvertToAirportTime() {
+        System.out.println("convertToAirportTime");
+        List<Flight> flights = null;
+        FlightInfoController instance = new FlightInfoController();
+        instance.convertToAirportTime(flights);
+        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
     
     @Test
