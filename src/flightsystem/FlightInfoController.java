@@ -435,7 +435,7 @@ public class FlightInfoController {
              flight.setmDepTime(gmtDepTime.withZoneSameInstant(zoneDep).toLocalDateTime());
 
              ZonedDateTime gmtArrTime = ZonedDateTime.of(mArrTime, gmtZone);
-             flight.setmArrTime(gmtArrTime.withZoneSameInstant(zoneDep).toLocalDateTime());
+             flight.setmArrTime(gmtArrTime.withZoneSameInstant(zoneArr).toLocalDateTime());
 
             }
             
