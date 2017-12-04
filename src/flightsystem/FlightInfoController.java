@@ -236,6 +236,7 @@ public class FlightInfoController {
                     return false;
                 }
                 if (f.getmDepTime().isAfter(gmtDepDateTime)) {
+                    f.setmSeatTypeAvailable(seatTypes);
                     return true;
                 } else {
                     return false;
@@ -270,6 +271,7 @@ public class FlightInfoController {
                 }
                 long diff = DurationMins(depTime, f.getmDepTime());
                 if ((diff >= 30 && diff <= 240) && !isInDfsHistory(history, f)) {
+                    f.setmSeatTypeAvailable(seatTypes);
                     return true;
                 } else {
                     return false;
@@ -312,7 +314,8 @@ public class FlightInfoController {
             }
             if (f.getmArrAirport().equals(toAirportCode)) {
                 if (f.getmDepTime().isAfter(gmtFromDateTime)) {
-                   return true;
+                    f.setmSeatTypeAvailable(seatTypes);
+                    return true;
                 }
             }
             return false;
@@ -368,6 +371,8 @@ public class FlightInfoController {
             airplaneCache.put(model, a);
         }
     }
+    
+    
 }
 
 

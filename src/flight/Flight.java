@@ -270,7 +270,7 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
             else
                 throw new IllegalArgumentException(mSeatTypeAvailable.toString());
         }
-        public void setmSeatTypeAvailable(ArrayList<String> seatTypes)
+        public void setmSeatTypeAvailable(List<String> seatTypes)
         {
             for ( String seat: seatTypes)
             {
