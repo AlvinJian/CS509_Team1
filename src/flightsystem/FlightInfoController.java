@@ -122,7 +122,7 @@ public class FlightInfoController {
             public void run() {
                 Flights ret;
                 synchronized (serverLck) {
-                    ret = SearchFlightsImpl(fromAirportCode, fromTime, toAirportCode, seatTypes);
+                    ret = searchFlightsImpl(fromAirportCode, fromTime, toAirportCode, seatTypes);
                     controllerLogger.log(logLevel, "flight count={0}", ret.size());
                     directFlightsCache = ret;
                 }
@@ -181,7 +181,8 @@ public class FlightInfoController {
     }
 
     private boolean isInDfsHistory(List<Flight> list, Flight flight) {
-        controllerLogger.log(Level.INFO, "===START===");
+        Level level = Level.FINE;
+        controllerLogger.log(level, "===START===");
         StringBuilder builder = new StringBuilder();
         for (Flight f : list) {
             String depCode = f.getmDepAirport();
@@ -190,15 +191,15 @@ public class FlightInfoController {
             LocalDateTime arrDateTime = f.getmArrTime();
             String msg = String.format("depCode=%s depDateTime=%s arrCode=%s arrDateTime=%s",
                     depCode, depDateTime.toString(), arrCode, arrDateTime.toString());
-            controllerLogger.log(Level.INFO, msg);
+            controllerLogger.log(level, msg);
             builder.append(f.getmNumber());
             builder.append(", ");
             if (flight.getmArrAirport().equals(f.getmDepAirport())) {
                 return true;
             }
         }
-        controllerLogger.log(Level.INFO, builder.toString());
-        controllerLogger.log(Level.INFO, "===END===");
+        controllerLogger.log(level, builder.toString());
+        controllerLogger.log(level, "===END===");
         return false;
     }
 
@@ -208,6 +209,17 @@ public class FlightInfoController {
     }
     
     private List<List<Flight>> _stopoverFlights;
+    
+    private boolean isAnySeatTypeAvailable(Flight f, List<String> seatTypes) {
+        boolean avail = false;
+        for (String seatType : seatTypes) {
+            if (isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
+                avail = true;
+                break;
+            }
+        }
+        return avail;
+    }
     
     private List<List<Flight>> searchStopoverFlightsImpl(String depAirportCode, 
             LocalDateTime depTime, String arrAirportCode, List<String> seatTypes, int stopover) {
@@ -220,10 +232,8 @@ public class FlightInfoController {
             @Override
             public boolean isValid(Flight f) {
                 if (f == null) return false;
-                for (String seatType: seatTypes) {
-                    if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
-                        return false;
-                    }
+                if (!isAnySeatTypeAvailable(f, seatTypes)) {
+                    return false;
                 }
                 if (f.getmDepTime().isAfter(gmtDepDateTime)) {
                     return true;
@@ -255,10 +265,8 @@ public class FlightInfoController {
             @Override
             public boolean isValid(Flight f) {
                 if (f == null) return false;
-                for (String seatType: seatTypes) {
-                    if (!isSeatAvailable(f, airplaneCache.get(f.getmAirplane()), seatType)) {
-                        return false;
-                    }
+                if (!isAnySeatTypeAvailable(f, seatTypes)) {
+                    return false;
                 }
                 long diff = DurationMins(depTime, f.getmDepTime());
                 if ((diff >= 30 && diff <= 240) && !isInDfsHistory(history, f)) {
@@ -286,7 +294,7 @@ public class FlightInfoController {
         }
     }
 
-    private Flights SearchFlightsImpl(String fromAirportCode, LocalDateTime fromTime,
+    private Flights searchFlightsImpl(String fromAirportCode, LocalDateTime fromTime,
             String toAirportCode, List<String> seatTypes) {
         final Airport fromAirport = getAirportByCode(fromAirportCode);
         ZoneId fromZoneId = AirportZoneMap.GetTimeZoneByAiport(fromAirport);
