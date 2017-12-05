@@ -58,7 +58,7 @@ public class FlightInfoControllerTest {
         System.out.println("syncAirports");
         FlightInfoController instance = new FlightInfoController();
         Airports expResult = null;
-        Airports result = instance.syncAirports();
+        Airports result = instance.getAirports();
 //        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
@@ -120,7 +120,7 @@ public class FlightInfoControllerTest {
     public void testSyncAirplanes() {
         System.out.println("syncAirplanes");
         FlightInfoController instance = new FlightInfoController();
-        instance.syncAirplanes();
+        instance.getAirplanes();
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }

@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
- *
+ * Controller class standing between UI and server interface
  * @author alvin
  */
 public class FlightInfoController {
@@ -52,22 +52,36 @@ public class FlightInfoController {
     private Map<String, Airplane> airplaneCache;
 
     public FlightInfoController() {
-        syncAirplanes();
+        getAirplanes();
     }
 
+    /**
+     * Callback object for searchDirectFlight
+     */
     public interface FlightsReceiver {
         public void onReceived(Flights ret);
     }
+    
+    /**
+     * Callback object for reserveFlight
+     */
     public interface FlightConfirmationReceiver
     {
         public void onReceived(FlightConfirmation confirm);
     }
     
+    /**
+     * Callback object for searchStopoverFlights
+     */
     public interface StopoverFlightsReceiver {
         public void onReceived(List<List<Flight>> ret);
     }
 
-    public Airports syncAirports() {
+    /**
+     * Get airport object
+     * @return airports 
+     */
+    public Airports getAirports() {
         synchronized (serverLck) {
             airportsCache = ServerInterface.INSTANCE.getAirports(teamName);
         }
@@ -138,10 +152,19 @@ public class FlightInfoController {
         
         
     }
+    
+    /**
+     * search for direct flights
+     * @param fromAirportCode
+     * @param fromTime
+     * @param toAirportCode
+     * @param seatTypes
+     * @param receiver 
+     */
     public void searchDirectFlight(String fromAirportCode, LocalDateTime fromTime,
             String toAirportCode, List<String> seatTypes, FlightsReceiver receiver) {
         if (airportsCache == null) {
-            syncAirports();
+            getAirports();
         }
 //        controllerLogger.log(Level.INFO, "fromAirportCode={0}, fromTime={1}, toAirportCode={2}, receiver={3}",
 //                new Object[]{fromAirportCode, fromTime, toAirportCode, receiver});
@@ -169,6 +192,15 @@ public class FlightInfoController {
         t.start();
     }
     
+    /**
+     * Search for Flights with stopovers
+     * @param depAirportCode
+     * @param depTime
+     * @param arrAirportCode
+     * @param seatTypes
+     * @param stopover
+     * @param receiver 
+     */
     public void searchStopoverFlights(String depAirportCode, LocalDateTime depTime, 
             String arrAirportCode, List<String> seatTypes, int stopover, 
             StopoverFlightsReceiver receiver) {
@@ -406,7 +438,7 @@ public class FlightInfoController {
 
     }
     
-    public void syncAirplanes() {
+    public void getAirplanes() {
         Airplanes allPlanes = ServerInterface.INSTANCE.getAirplanes(teamName);
         airplaneCache = new HashMap<>();
         for (Airplane a: allPlanes) {
@@ -419,36 +451,33 @@ public class FlightInfoController {
      * Convert the departure and arrival time to the airport local time
      * @param flights - the flights need to be converted
      */
-     public void convertToAirportTime(List<Flight> flights) {
-            String mDepAirport;
-            LocalDateTime mDepTime;
-            String mArrAirport;
-            LocalDateTime mArrTime;
-            
-            for (Flight flight : flights) {
-             mDepAirport = flight.getmDepAirport();
-             mDepTime = flight.getmDepTime();
-             mArrAirport = flight.getmArrAirport();
-             mArrTime = flight.getmArrTime();
+    public void convertToAirportTime(List<Flight> flights) {
+        String mDepAirport;
+        LocalDateTime mDepTime;
+        String mArrAirport;
+        LocalDateTime mArrTime;
 
-             //Airportcode -> Airport
-             Airport depAirport = getAirportByCode(mDepAirport);
-             Airport arrAirport = getAirportByCode(mArrAirport);
+        for (Flight flight : flights) {
+            mDepAirport = flight.getmDepAirport();
+            mDepTime = flight.getmDepTime();
+            mArrAirport = flight.getmArrAirport();
+            mArrTime = flight.getmArrTime();
 
-             ZoneId zoneDep = AirportZoneMap.GetTimeZoneByAiport(depAirport);
-             ZoneId zoneArr = AirportZoneMap.GetTimeZoneByAiport(arrAirport);
-             ZoneId gmtZone = ZoneId.of("GMT");
+            //Airportcode -> Airport
+            Airport depAirport = getAirportByCode(mDepAirport);
+            Airport arrAirport = getAirportByCode(mArrAirport);
 
-             ZonedDateTime gmtDepTime = ZonedDateTime.of(mDepTime, gmtZone);
-             flight.setmDepTime(gmtDepTime.withZoneSameInstant(zoneDep).toLocalDateTime());
+            ZoneId zoneDep = AirportZoneMap.GetTimeZoneByAiport(depAirport);
+            ZoneId zoneArr = AirportZoneMap.GetTimeZoneByAiport(arrAirport);
+            ZoneId gmtZone = ZoneId.of("GMT");
 
-             ZonedDateTime gmtArrTime = ZonedDateTime.of(mArrTime, gmtZone);
-             flight.setmArrTime(gmtArrTime.withZoneSameInstant(zoneArr).toLocalDateTime());
+            ZonedDateTime gmtDepTime = ZonedDateTime.of(mDepTime, gmtZone);
+            flight.setmDepTime(gmtDepTime.withZoneSameInstant(zoneDep).toLocalDateTime());
 
-            }
-            
-            
+            ZonedDateTime gmtArrTime = ZonedDateTime.of(mArrTime, gmtZone);
+            flight.setmArrTime(gmtArrTime.withZoneSameInstant(zoneArr).toLocalDateTime());
         }
+    }
 }
 
 

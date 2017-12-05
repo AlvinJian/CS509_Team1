@@ -96,7 +96,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
     {
         flightSystemUILogger.log(Level.INFO, "Getting airports");
 	// Try to get a list of airports
-        Airports airports = flightInfoController.syncAirports();
+        Airports airports = flightInfoController.getAirports();
 	Collections.sort(airports);
         airports.forEach((airport) -> {
             addAiportToComboBoxes(airport.code(), airport.name());
