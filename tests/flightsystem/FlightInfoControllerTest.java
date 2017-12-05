@@ -108,7 +108,7 @@ public class FlightInfoControllerTest {
         int stopover = 0;
         FlightInfoController.StopoverFlightsReceiver receiver = null;
         FlightInfoController instance = new FlightInfoController();
-        instance.SearchStopoverFlights(depAirportCode, depTime, arrAirportCode, seatTypes, stopover, receiver);
+        //instance.SearchStopoverFlights(depAirportCode, depTime, arrAirportCode, seatTypes, stopover, receiver);
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
@@ -138,26 +138,26 @@ public class FlightInfoControllerTest {
 //        fail("The test case is a prototype.");
     }
     
-    @Test
-    public void testReserveFlight() {
-        System.out.println("searchDirectFlight");
-        String fromAirportCode = "";
-        LocalDateTime fromTime = null;
-        String toAirportCode = "";
-        ReserveFlight reserveFlightObj = new ReserveFlight();
-        reserveFlightObj.addSeat("4853", "COACH");
-        AtomicBoolean magic = new AtomicBoolean();
-        magic.set(false);
-        FlightInfoController.FlightConfirmationReceiver receiver = new FlightInfoController.FlightConfirmationReceiver() {
-            @Override
-            public void onReceived(FlightConfirmation confirm) {
-                System.out.println("receive");
-                magic.set(true);
-            }
-        };
-        FlightInfoController instance = new FlightInfoController();
-        instance.reserveFlight(reserveFlightObj, receiver);
-        
+//    @Test
+//    public void testReserveFlight() {
+//        System.out.println("searchDirectFlight");
+//        String fromAirportCode = "";
+//        LocalDateTime fromTime = null;
+//        String toAirportCode = "";
+//        ReserveFlight reserveFlightObj = new ReserveFlight();
+//        reserveFlightObj.addSeat("4853", "COACH");
+//        AtomicBoolean magic = new AtomicBoolean();
+//        magic.set(false);
+//        FlightInfoController.FlightConfirmationReceiver receiver = new FlightInfoController.FlightConfirmationReceiver() {
+//            @Override
+//            public void onReceived(FlightConfirmation confirm) {
+//                System.out.println("receive");
+//                magic.set(true);
+//            }
+//        };
+//        FlightInfoController instance = new FlightInfoController();
+//        instance.reserveFlight(reserveFlightObj, receiver);
+//        
 //        fail("The test case is a prototype.");
     }
 }

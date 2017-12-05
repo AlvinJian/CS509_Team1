@@ -77,7 +77,7 @@
                                           <EmptySpace min="41" pref="41" max="-2" attributes="0"/>
                                           <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Component id="dateTimePicker" min="-2" pref="283" max="-2" attributes="0"/>
+                                      <Component id="departureDateTimePicker" min="-2" pref="283" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -85,7 +85,7 @@
                                           <EmptySpace min="34" pref="34" max="-2" attributes="0"/>
                                           <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Component id="dateTimePickerReturn" min="-2" pref="283" max="-2" attributes="0"/>
+                                      <Component id="returnDateTimePicker" min="-2" pref="283" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -142,12 +142,12 @@
                           <Group type="102" attributes="0">
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                              <Component id="dateTimePicker" min="-2" pref="32" max="-2" attributes="0"/>
+                              <Component id="departureDateTimePicker" min="-2" pref="32" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                              <Component id="dateTimePickerReturn" min="-2" pref="32" max="-2" attributes="0"/>
+                              <Component id="returnDateTimePicker" min="-2" pref="32" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -169,9 +169,9 @@
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace min="13" pref="13" max="-2" attributes="0"/>
-              <Component id="jScrollPane3" min="-2" pref="141" max="-2" attributes="0"/>
-              <EmptySpace min="16" pref="16" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane3" min="-2" pref="164" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                   <Component id="departureLabelIn" min="-2" max="-2" attributes="0"/>
@@ -182,7 +182,7 @@
               <Component id="jScrollPane2" min="-2" pref="124" max="-2" attributes="0"/>
               <EmptySpace min="13" pref="13" max="-2" attributes="0"/>
               <Component id="reserveButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="19" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -291,22 +291,15 @@
         <Component class="javax.swing.JTable" name="arrivalTable">
           <Properties>
             <Property name="autoCreateRowSorter" type="boolean" value="true"/>
-            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder/>
-              </Border>
-            </Property>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="9" rowCount="4">
-                <Column editable="true" title="Flight #" type="java.lang.Object"/>
-                <Column editable="true" title="Departure" type="java.lang.Object"/>
-                <Column editable="true" title="Departure Tme" type="java.lang.Object"/>
-                <Column editable="true" title="Arrival" type="java.lang.Object"/>
-                <Column editable="true" title="Arrival Time" type="java.lang.Object"/>
-                <Column editable="true" title="Flight Time" type="java.lang.Object"/>
-                <Column editable="true" title="Seat Type" type="java.lang.Object"/>
-                <Column editable="true" title="Price" type="java.lang.Object"/>
-                <Column editable="true" title="# of Layovers" type="java.lang.Object"/>
+              <Table columnCount="7" rowCount="4">
+                <Column editable="false" title="Flight #(s)" type="java.lang.Object"/>
+                <Column editable="false" title="Departure-&gt;Arrival(Airports)" type="java.lang.Object"/>
+                <Column editable="false" title="Departure-&gt;Arrival(Times)" type="java.lang.Object"/>
+                <Column editable="false" title="Layover Time(s)(Minutes)" type="java.lang.Object"/>
+                <Column editable="false" title="Total Flight Time" type="java.lang.Object"/>
+                <Column editable="false" title="Total Price" type="java.lang.Object"/>
+                <Column editable="false" title="# of Layovers" type="java.lang.Object"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -346,20 +339,10 @@
                   <Editor/>
                   <Renderer/>
                 </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title/>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title/>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
               </TableColumnModel>
             </Property>
             <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
-              <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
+              <TableHeader reorderingAllowed="false" resizingAllowed="true"/>
             </Property>
           </Properties>
         </Component>
@@ -377,13 +360,13 @@
             <Property name="autoCreateRowSorter" type="boolean" value="true"/>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
               <Table columnCount="7" rowCount="4">
-                <Column editable="true" title="Flight #" type="java.lang.Object"/>
-                <Column editable="true" title="Departure-&gt;Arrival" type="java.lang.Object"/>
-                <Column editable="true" title="Departure Time" type="java.lang.Object"/>
-                <Column editable="true" title="Arrival Time" type="java.lang.Object"/>
-                <Column editable="true" title="Flight Time" type="java.lang.Object"/>
-                <Column editable="true" title="Total Price" type="java.lang.Object"/>
-                <Column editable="true" title="# of Layovers" type="java.lang.Object"/>
+                <Column editable="false" title="Flight #" type="java.lang.Object"/>
+                <Column editable="false" title="Departure-&gt;Arrival(Airports)" type="java.lang.Object"/>
+                <Column editable="false" title="Departure-&gt;Arrival(Times)" type="java.lang.Object"/>
+                <Column editable="false" title="Layover Time(s)(Minutes)" type="java.lang.Object"/>
+                <Column editable="false" title="Total Flight Time" type="java.lang.Object"/>
+                <Column editable="false" title="Total Price" type="java.lang.Object"/>
+                <Column editable="false" title="# of Layovers" type="java.lang.Object"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -426,7 +409,7 @@
               </TableColumnModel>
             </Property>
             <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
-              <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
+              <TableHeader reorderingAllowed="false" resizingAllowed="true"/>
             </Property>
           </Properties>
         </Component>
@@ -462,7 +445,7 @@
         <Property name="text" type="java.lang.String" value="Arrival"/>
       </Properties>
     </Component>
-    <Component class="com.github.lgooddatepicker.components.DateTimePicker" name="dateTimePicker">
+    <Component class="com.github.lgooddatepicker.components.DateTimePicker" name="departureDateTimePicker">
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value=" new DateTimePicker(dateSettings, null);"/>
         <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="        dateSettings.setDateRangeLimits(currentDate, futureDate);"/>
@@ -483,7 +466,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="roundtripCheckBoxActionPerformed"/>
       </Events>
     </Component>
-    <Component class="com.github.lgooddatepicker.components.DateTimePicker" name="dateTimePickerReturn">
+    <Component class="com.github.lgooddatepicker.components.DateTimePicker" name="returnDateTimePicker">
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value=" new DateTimePicker(dateSettings1, null);"/>
         <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="        dateSettings1.setDateRangeLimits(currentDate, futureDate);"/>

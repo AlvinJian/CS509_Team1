@@ -5,6 +5,8 @@
  */
 package flightsystem;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +20,7 @@ public class TableItems {
     FlightNumber flightNumberClass = new FlightNumber();
     DestinationAirports destinationAirportsClass = new DestinationAirports();
     DepartureArrival departureArrivalClass = new DepartureArrival();
-    
+    DepartureArrivalTime departureArrivalTimeClass = new DepartureArrivalTime();
     
     class FlightNumber {
         List<String> flightNumbers;
@@ -110,5 +112,59 @@ public class TableItems {
         }
         
     }
-    
+    class DepartureArrivalTime
+    {
+        List<HashMap<String, LocalDateTime>> departureArrivalTimeList ;
+        public DepartureArrivalTime() {
+            departureArrivalTimeList = new ArrayList<>();
+        }
+        public void addDepartureArrivalTime( LocalDateTime departureTime, LocalDateTime ArrivalTime)
+        {
+            HashMap<String, LocalDateTime> infoMap = new HashMap<>();
+            infoMap.put("departure",departureTime);
+            infoMap.put("arrival", ArrivalTime);
+            departureArrivalTimeList.add(infoMap);
+        }
+        public String getLayOverTimes()
+        {
+            String output = "0";
+            HashMap<String, LocalDateTime> previousMap = new HashMap<>();
+            for (HashMap<String, LocalDateTime> infoMap: departureArrivalTimeList)
+            {
+                if(previousMap.isEmpty())
+                {
+                     previousMap = infoMap; 
+                     continue;
+                }
+                Long duration = Duration.between( previousMap.get("arrival"), infoMap.get("departure") ).toMinutes();
+                if ( output.equals("0"))
+                {
+                    output = duration.toString();
+                }
+                else
+                {
+                    output += "," + duration.toString();
+                }
+                previousMap = infoMap;
+            }
+            return output;
+        }
+        @Override
+        public String toString()
+        {
+            String output = "";
+            HashMap<String, LocalDateTime> previousMap = new HashMap<>();
+            for (HashMap<String, LocalDateTime> infoMap:departureArrivalTimeList)
+            {
+                if(previousMap.isEmpty())
+                {
+                     previousMap = infoMap; 
+                     output += infoMap.get("departure") + "->"+ infoMap.get("arrival");
+                     continue;
+                }
+                output += "-LAYOVER-"+infoMap.get("departure")+ "->"+ infoMap.get("arrival");
+            }
+            return output;
+        }
+    }
 }

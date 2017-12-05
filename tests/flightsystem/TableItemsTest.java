@@ -5,6 +5,7 @@
  */
 package flightsystem;
 
+import java.time.LocalDateTime;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -46,13 +47,37 @@ public class TableItemsTest {
         assert(returnString.equals("503 504"));
     }
     @Test
-    public void testDepartureArrivalString() {
+    public void testDepartureArrivalTimeString() {
         TableItems tableItems = new TableItems();
-        tableItems.departureArrivalClass.addDepartureArrival("BOS", "DEV", "Coach");
-        tableItems.departureArrivalClass.addDepartureArrival("DEV", "LA", "FirstClass");
-        tableItems.departureArrivalClass.addDepartureArrival("LA", "FL", "FirstClass");
-        String returnString = tableItems.departureArrivalClass.toString();
+        tableItems.departureArrivalClass.addDepartureArrival("BOS", "CLE", "COACH");
+        tableItems.departureArrivalClass.addDepartureArrival("CLE", "GE", "COACH");
+        tableItems.departureArrivalClass.addDepartureArrival("GE", "FL", "COACH");
+        String sg = tableItems.departureArrivalClass.toString();
+        //tableItems.departureArrivalTimeClass.addDepartureArrivalTime("5PM", "10PM");
+        //tableItems.departureArrivalTimeClass.addDepartureArrivalTime("11PM", "11:30PM");
+        //String returnString = tableItems.departureArrivalTimeClass.toString();
         assert( true );
     }
+    @Test
+    public void testLayoverString() 
+    {
+        TableItems tableItems = new TableItems();
+        LocalDateTime departure1 = LocalDateTime.now();
+        LocalDateTime arrival1 = LocalDateTime.now().plusHours(1);
+        tableItems.departureArrivalTimeClass.addDepartureArrivalTime(departure1, arrival1);
+        LocalDateTime departure2 = LocalDateTime.now().plusHours(2);
+        LocalDateTime arrival2 = LocalDateTime.now().plusHours(3);
+        tableItems.departureArrivalTimeClass.addDepartureArrivalTime(departure2, arrival2);
+        LocalDateTime departure3 = LocalDateTime.now().plusHours(5);
+        LocalDateTime arrival3 = LocalDateTime.now().plusHours(6);
+        tableItems.departureArrivalTimeClass.addDepartureArrivalTime(departure3, arrival3);
+        String layoverTimes = tableItems.departureArrivalTimeClass.getLayOverTimes();
+        assert( layoverTimes.equals("60,120"));
+        
+        String bb = tableItems.departureArrivalTimeClass.toString();
+        assert( true );
+        
+    }
+    
     
 }
