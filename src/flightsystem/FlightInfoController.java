@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -112,7 +113,6 @@ public class FlightInfoController {
                 public void run() {
                     Runnable _r = () -> receiver.onReceived(flightConfirm);
                     SwingUtilities.invokeLater(_r);
-//                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
                 }
 
             }, 30000);
@@ -166,8 +166,6 @@ public class FlightInfoController {
         if (airportsCache == null) {
             getAirports();
         }
-//        controllerLogger.log(Level.INFO, "fromAirportCode={0}, fromTime={1}, toAirportCode={2}, receiver={3}",
-//                new Object[]{fromAirportCode, fromTime, toAirportCode, receiver});
         if (fromAirportCode == null || fromTime == null || toAirportCode == null
                 || receiver == null) {
             controllerLogger.log(Level.SEVERE, "searchDirectFlight args error");
@@ -355,12 +353,6 @@ public class FlightInfoController {
             if (newHistory.size() == stopover+1) {
                 if (f.getmArrAirport().equals(arrAirportCode)) {
                     convertToAirportTime(newHistory);
-                    List<List<Flight>> ret = new ArrayList<>();
-                    //copyFlightList(ret, newHistory, newHistory, stopover, 0);
-                    /*for (List<Flight> r: ret) {
-                        copyFlightListTest(r);
-                        _stopoverFlights.add(r);
-                    }*/
                     _stopoverFlights.add(newHistory);
                 }
             } else {
