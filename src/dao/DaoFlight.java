@@ -48,18 +48,10 @@ public class DaoFlight {
         for (int i = 0; i < nodesFlights.getLength(); ++i) {
             Element elementFlight = (Element) nodesFlights.item(i);
             Flight flight = buildFlight(elementFlight);
-            // TODO we need check flight instance is valid in ONE method. 
-            //if (flight.isValid()) {
             if (flight != null) {
                 flights.add(flight);
-                String depCode = flight.getmDepAirport();
-                String arrCode = flight.getmArrAirport();
-//                flightLogger.log(Level.INFO, "depCode={0} arrCode={1}", new Object[] {
-//                    depCode, arrCode});
             }
-            //}
         }
-        //flightLogger.log(Level.INFO, "flight entries={0}", flights.size());
         return flights;
     }
     
