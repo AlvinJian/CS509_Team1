@@ -108,9 +108,12 @@ public class FlightInfoController {
         {
             final FlightConfirmation flightConfirm = new FlightConfirmation(false, "timeout");
             Timer timer = new Timer();
+            AtomicBoolean timeOut = new AtomicBoolean();
+            timeOut.set(false);
             timer.schedule(new java.util.TimerTask() {
                 @Override
                 public void run() {
+                    timeOut.set(true);
                     Runnable _r = () -> receiver.onReceived(flightConfirm);
                     SwingUtilities.invokeLater(_r);
                 }
@@ -130,6 +133,9 @@ public class FlightInfoController {
                                 } catch (InterruptedException ex) {
                                     controllerLogger.log(Level.SEVERE, ex.toString());
                                 }
+                            }
+                            if (timeOut.get() == true) {
+                                return;
                             }
                         }
                         timer.cancel();
