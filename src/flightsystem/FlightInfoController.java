@@ -102,20 +102,32 @@ public class FlightInfoController {
                 }
 
             }, 30000);
-            //TODO: add thread to loop until database is unlocked
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
+                    boolean isReserved = false;
                     synchronized (serverLck) {
                         boolean isGetLock = ServerInterface.INSTANCE.lock(teamName);
                         while (!isGetLock) {
                             isGetLock = ServerInterface.INSTANCE.lock(teamName);
+                            if (!isGetLock) {
+                                try {
+                                    Thread.sleep(200L);
+                                } catch (InterruptedException ex) {
+                                    controllerLogger.log(Level.SEVERE, ex.toString());
+                                }
+                            }
                         }
                         timer.cancel();
-                        ServerInterface.INSTANCE.reserveSeat(teamName, reserveFlightObj);
+                        isReserved = ServerInterface.INSTANCE.reserveSeat(teamName, reserveFlightObj);
                         ServerInterface.INSTANCE.unlock(teamName);
                     }
-                    final FlightConfirmation flightConfirm = new FlightConfirmation(true, "");
+                    FlightConfirmation flightConfirm;
+                    if (isReserved) {
+                        flightConfirm = new FlightConfirmation(true, "");
+                    } else {
+                        flightConfirm = new FlightConfirmation(false, "Cannot reserve flight");
+                    }
                     Runnable _r = () -> receiver.onReceived(flightConfirm);
                     SwingUtilities.invokeLater(_r);
                 }
