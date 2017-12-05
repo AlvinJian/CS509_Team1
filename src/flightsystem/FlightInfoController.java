@@ -74,6 +74,12 @@ public class FlightInfoController {
         return airportsCache;
     }
     
+    /**
+     * Acquire the lock, reserve the flights, and unlock the database.
+     * If the request can't acquire the lock in 30 seconds, then it will fail.
+     * @param reserveFlightObj - the flights that need to be reserved
+     * @param receiver  - 
+     */
     public void reserveFlight(ReserveFlight reserveFlightObj, FlightConfirmationReceiver receiver)
     {
         String xml = reserveFlightObj.getXML();
@@ -306,7 +312,7 @@ public class FlightInfoController {
                 if (f.getmArrAirport().equals(arrAirportCode)) {
                     convertToAirportTime(newHistory);
                     List<List<Flight>> ret = new ArrayList<>();
-                    copyFlightList(ret, newHistory, newHistory, stopover, 0);
+                    //copyFlightList(ret, newHistory, newHistory, stopover, 0);
                     /*for (List<Flight> r: ret) {
                         copyFlightListTest(r);
                         _stopoverFlights.add(r);
@@ -348,50 +354,6 @@ public class FlightInfoController {
                 gmtFromDateTime, arrivalFilter);
         convertToAirportTime(ret);
         return ret;
-    }
-    
-    private void copyFlightListTest(List<Flight> fs) {
-        Level level = Level.INFO;
-        StringBuilder builder = new StringBuilder();
-        for (Flight f: fs) {
-            builder.append(String.format("departCode=%s ", f.getmDepAirport()));
-            builder.append(String.format("departTime=%s ", f.getmDepTime().toString()));
-            builder.append(String.format("arrCode=%s ", f.getmArrAirport()));
-            builder.append(String.format("arrTime=%s ", f.getmArrTime().toString()));
-            builder.append(String.format("seat_type=%s", 
-                    f.getmSeatTypeAvailable().toString()));
-        }
-        controllerLogger.log(level, builder.toString());
-    }
-
-    private void copyFlightList(List<List<Flight>> result, List<Flight> flights, List<Flight> original, int stopover, int index) {
-        if(flights.size() == 0 || flights == null || index < stopover + 1) {
-            result.add(new ArrayList<>(flights));
-            return;
-        }
-        
-        System.out.println("0---");
-        List<String> seatTypes;
-        Flight f = original.get(index);
-//        index++;
-        if(f.getmSeatTypeAvailable().size() == 1) {
-            System.out.println("1---");
-            copyFlightList(result, flights, original, stopover, index++);
-        } else {
-            System.out.println("2---");
-            List<Flight> copy = new ArrayList<>(flights);
-            List<Flight> copy2 = new ArrayList<>(flights);
-            List<String> coach = new ArrayList<>();
-            coach.add(Airplane.COACH);
-            copy.get(index).replacemSeatTypeAvailable(coach);
-            index++;
-            copyFlightList(result, copy, original, stopover, index);
-            List<String> first = new ArrayList<>();
-            first.add(Airplane.FIRST);
-            copy2.get(index).replacemSeatTypeAvailable(first);
-            copyFlightList(result, copy2, original, stopover, index);
-        }
-        
     }
     
     private Airport getAirportByCode(String code) {
@@ -440,7 +402,11 @@ public class FlightInfoController {
             airplaneCache.put(model, a);
         }
     }
-    
+        
+    /**
+     * Convert the departure and arrival time to the airport local time
+     * @param flights - the flights need to be converted
+     */
      public void convertToAirportTime(List<Flight> flights) {
             String mDepAirport;
             LocalDateTime mDepTime;
