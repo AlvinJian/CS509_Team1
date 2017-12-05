@@ -135,6 +135,9 @@ public class FlightInfoController {
                                 }
                             }
                             if (timeOut.get() == true) {
+                                if (isGetLock) {
+                                    ServerInterface.INSTANCE.unlock(teamName);
+                                }
                                 return;
                             }
                         }
