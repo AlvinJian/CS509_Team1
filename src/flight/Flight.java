@@ -287,7 +287,7 @@ public class Flight implements Comparable<Flight>, Comparator<Flight> {
 
         public void replacemSeatTypeAvailable(List<String> seatTypes)
         {
-            mSeatTypeAvailable = seatTypes;
+            mSeatTypeAvailable = new ArrayList<>(seatTypes);
         }
         
 	/**

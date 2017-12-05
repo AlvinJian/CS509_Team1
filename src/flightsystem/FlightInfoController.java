@@ -307,11 +307,11 @@ public class FlightInfoController {
                     convertToAirportTime(newHistory);
                     List<List<Flight>> ret = new ArrayList<>();
                     copyFlightList(ret, newHistory, newHistory, stopover, 0);
-                    for (List<Flight> r: ret) {
+                    /*for (List<Flight> r: ret) {
                         copyFlightListTest(r);
                         _stopoverFlights.add(r);
-                    }
-//                    _stopoverFlights.add(newHistory);
+                    }*/
+                    _stopoverFlights.add(newHistory);
                 }
             } else {
                 String nextDepAirportCode = f.getmArrAirport();
@@ -346,6 +346,7 @@ public class FlightInfoController {
         };
         Flights ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(),
                 gmtFromDateTime, arrivalFilter);
+        convertToAirportTime(ret);
         return ret;
     }
     
@@ -368,22 +369,27 @@ public class FlightInfoController {
             result.add(new ArrayList<>(flights));
             return;
         }
-            
+        
+        System.out.println("0---");
         List<String> seatTypes;
         Flight f = original.get(index);
-        index++;
-        if(f.getmSeatTypeAvailable().size() <= 1) {
-            copyFlightList(result, flights, original, stopover, index);
+//        index++;
+        if(f.getmSeatTypeAvailable().size() == 1) {
+            System.out.println("1---");
+            copyFlightList(result, flights, original, stopover, index++);
         } else {
+            System.out.println("2---");
             List<Flight> copy = new ArrayList<>(flights);
+            List<Flight> copy2 = new ArrayList<>(flights);
             List<String> coach = new ArrayList<>();
             coach.add(Airplane.COACH);
             copy.get(index).replacemSeatTypeAvailable(coach);
+            index++;
             copyFlightList(result, copy, original, stopover, index);
             List<String> first = new ArrayList<>();
-            coach.add(Airplane.FIRST);
-            flights.get(index).replacemSeatTypeAvailable(first);
-            copyFlightList(result, flights, original, stopover, index);
+            first.add(Airplane.FIRST);
+            copy2.get(index).replacemSeatTypeAvailable(first);
+            copyFlightList(result, copy2, original, stopover, index);
         }
         
     }
