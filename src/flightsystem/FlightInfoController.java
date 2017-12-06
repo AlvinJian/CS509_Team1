@@ -93,7 +93,7 @@ public class FlightInfoController {
      * Acquire the lock, reserve the flights, and unlock the database.
      * If the request can't acquire the lock in 30 seconds, then it will fail.
      * @param reserveFlightObj - the flights that need to be reserved
-     * @param receiver  - 
+     * @param receiver
      */
     public void reserveFlight(ReserveFlight reserveFlightObj, FlightConfirmationReceiver receiver)
     {
@@ -201,11 +201,11 @@ public class FlightInfoController {
     
     /**
      * Search for Flights with stopovers
-     * @param depAirportCode
-     * @param depTime
-     * @param arrAirportCode
-     * @param seatTypes
-     * @param stopover
+     * @param depAirportCode - Departure airport code
+     * @param depTime - Departure time
+     * @param arrAirportCode - Arrival airport code
+     * @param seatTypes - Seat type that is being reserved
+     * @param stopover - The stop over that is required by user
      * @param receiver 
      */
     public void searchStopoverFlights(String depAirportCode, LocalDateTime depTime, 
@@ -233,7 +233,11 @@ public class FlightInfoController {
         Thread t = new Thread(r);
         t.start();
     }
-
+    
+    /**
+     * Testing the searching for stopover flights
+     * @param trial 
+     */
     private void stopOverSearchTest(List<List<Flight>> trial) {
         Level level = Level.INFO;
         controllerLogger.log(level, "trialSize={0}", trial.size());
@@ -254,6 +258,12 @@ public class FlightInfoController {
         }
     }
 
+    /**
+     * Check if the flight is exist in the previous stop over flights search history
+     * @param list - flights which are added in the list
+     * @param flight - the flight that needs to be checked
+     * @return true if the flight already exists in the previous search, otherwise, return false 
+     */
     private boolean isInDfsHistory(List<Flight> list, Flight flight) {
         Level level = Level.FINE;
         controllerLogger.log(level, "===START===");
@@ -277,13 +287,24 @@ public class FlightInfoController {
         return false;
     }
 
-    // t2 - t1
+    /**
+     * Calculate the duration between two flights
+     * @param t1 - start time
+     * @param t2 - end time
+     * @return the difference between two time
+     */
     private static long DurationMins(LocalDateTime t1, LocalDateTime t2) {
         return Duration.between(t1, t2).toMinutes();
     }
     
     private List<List<Flight>> _stopoverFlights;
     
+    /**
+     * Check if the flight has available seats for the seat type
+     * @param f - flight that is being checked
+     * @param seatTypes - a list seat types to be checked
+     * @return true is seat type is available, otherwise return false
+     */
     private boolean isAnySeatTypeAvailable(Flight f, List<String> seatTypes) {
         boolean avail = false;
         for (String seatType : seatTypes) {
@@ -295,6 +316,15 @@ public class FlightInfoController {
         return avail;
     }
     
+    /**
+     * Search for the first level of flight for searching stop over flights
+     * @param fromAirportCode - Departure airport code
+     * @param fromTime - Departure time
+     * @param toAirportCode - Arrival airport code
+     * @param seatTypes - Seat type that is being reserved
+     * @param stopover - The stop over that is required by user
+     * @return a list of a list of flights
+     */
     private List<List<Flight>> searchStopoverFlightsImpl(String depAirportCode, 
             LocalDateTime depTime, String arrAirportCode, List<String> seatTypes, int stopover) {
         Airport depAirport = getAirportByCode(depAirportCode);
@@ -334,6 +364,16 @@ public class FlightInfoController {
         return _stopoverFlights;
     }
     
+    /**
+     * The search algorithm for after second levels of tree
+     * @param history - previous flight
+     * @param fromAirportCode - Departure airport code
+     * @param fromTime - Departure time
+     * @param toAirportCode - Arrival airport code
+     * @param seatTypes - Seat type that is being reserved
+     * @param level - The current level we are currently searching
+     * @param stopover - The stop over that is required by user
+     */
     private void searchStopoverFlightsInner(List<Flight> history, 
             String depAirportCode, LocalDateTime depTime, String arrAirportCode, 
             List<String> seatTypes, int level, int stopover) {
@@ -373,6 +413,14 @@ public class FlightInfoController {
         }
     }
 
+    /**
+     * Search for the direct flight
+     * @param fromAirportCode - Departure airport code
+     * @param fromTime - Departure time
+     * @param toAirportCode - Arrival airport code
+     * @param seatTypes - Seat type that is being reserved
+     * @return all the flights list
+     */
     private Flights searchFlightsImpl(String fromAirportCode, LocalDateTime fromTime,
             String toAirportCode, List<String> seatTypes) {
         final Airport fromAirport = getAirportByCode(fromAirportCode);
@@ -401,6 +449,11 @@ public class FlightInfoController {
         return ret;
     }
     
+    /**
+     * Get the airport by airport code
+     * @param code - airport code
+     * @return Airport object
+     */
     private Airport getAirportByCode(String code) {
         if (airportsCache == null) {
             return null;
@@ -415,6 +468,13 @@ public class FlightInfoController {
         return ret;
     }
     
+    /**
+     * Check if the seat type of the flight has seat left
+     * @param flight - the flight is going to be reserved
+     * @param airplane - the airplane that needs to be checked
+     * @param seattype - seat type is going to be reserved
+     * @return true is the seat is available, otherwise return false;
+     */
     private boolean isSeatAvailable(Flight flight, Airplane airplane, String seattype) {
         boolean availableSeats = false;
 
@@ -439,6 +499,9 @@ public class FlightInfoController {
 
     }
     
+    /**
+     * Get all the airplanes from database
+     */
     public void getAirplanes() {
         Airplanes allPlanes = ServerInterface.INSTANCE.getAirplanes(teamName);
         airplaneCache = new HashMap<>();
