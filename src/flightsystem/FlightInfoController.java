@@ -39,6 +39,16 @@ import javax.swing.SwingUtilities;
 public class FlightInfoController {
 
     private static final Object serverLck = new Object();
+    private static ServerInterface serverInstance;
+    
+    /**
+     * Switch controller's server backend to another
+     * @param server 
+     */
+    public static void SwitchServer(ServerInterface server) {
+        serverInstance = server;
+    }
+    
     // TODO shouldn't be here
     private static final String teamName = "CS509team1";
     private static final Logger controllerLogger;
@@ -53,6 +63,7 @@ public class FlightInfoController {
     private Map<String, Airplane> airplaneCache;
 
     public FlightInfoController() {
+        serverInstance = ServerInterface.INSTANCE;
         getAirplanes();
     }
 
@@ -84,7 +95,7 @@ public class FlightInfoController {
      */
     public Airports getAirports() {
         synchronized (serverLck) {
-            airportsCache = ServerInterface.INSTANCE.getAirports(teamName);
+            airportsCache = serverInstance.getAirports(teamName);
         }
         return airportsCache;
     }
@@ -124,9 +135,9 @@ public class FlightInfoController {
                 public void run() {
                     boolean isReserved = false;
                     synchronized (serverLck) {
-                        boolean isGetLock = ServerInterface.INSTANCE.lock(teamName);
+                        boolean isGetLock = serverInstance.lock(teamName);
                         while (!isGetLock) {
-                            isGetLock = ServerInterface.INSTANCE.lock(teamName);
+                            isGetLock = serverInstance.lock(teamName);
                             if (!isGetLock) {
                                 try {
                                     Thread.sleep(200L);
@@ -136,14 +147,14 @@ public class FlightInfoController {
                             }
                             if (timeOut.get() == true) {
                                 if (isGetLock) {
-                                    ServerInterface.INSTANCE.unlock(teamName);
+                                    serverInstance.unlock(teamName);
                                 }
                                 return;
                             }
                         }
                         timer.cancel();
-                        isReserved = ServerInterface.INSTANCE.reserveSeat(teamName, reserveFlightObj);
-                        ServerInterface.INSTANCE.unlock(teamName);
+                        isReserved = serverInstance.reserveSeat(teamName, reserveFlightObj);
+                        serverInstance.unlock(teamName);
                     }
                     FlightConfirmation flightConfirm;
                     if (isReserved) {
@@ -349,7 +360,7 @@ public class FlightInfoController {
             }
         };
         _stopoverFlights = new ArrayList<>();
-        Flights flights = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, 
+        Flights flights = serverInstance.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, 
                 depAirportCode, gmtDepDateTime, lv1Filter);
         int level = 1;
         for (Flight f: flights) {
@@ -394,7 +405,7 @@ public class FlightInfoController {
                 }
             }
         };
-        Flights flights = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, 
+        Flights flights = serverInstance.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, 
                 depAirportCode, depTime, highLvFilter);
         for (Flight f: flights) {
             List<Flight> newHistory = new ArrayList<>(history);
@@ -443,7 +454,7 @@ public class FlightInfoController {
             }
             return false;
         };
-        Flights ret = ServerInterface.INSTANCE.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(),
+        Flights ret = serverInstance.getFlights(teamName, ServerInterface.QueryFlightType.DEPART, fromAirport.code(),
                 gmtFromDateTime, arrivalFilter);
         convertToAirportTime(ret);
         return ret;
@@ -503,7 +514,7 @@ public class FlightInfoController {
      * Get all the airplanes from database
      */
     public void getAirplanes() {
-        Airplanes allPlanes = ServerInterface.INSTANCE.getAirplanes(teamName);
+        Airplanes allPlanes = serverInstance.getAirplanes(teamName);
         airplaneCache = new HashMap<>();
         for (Airplane a: allPlanes) {
             String model = a.getmModel();
