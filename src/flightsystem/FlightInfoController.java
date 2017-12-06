@@ -106,7 +106,7 @@ public class FlightInfoController {
         }
         else
         {
-            final FlightConfirmation flightConfirm = new FlightConfirmation(false, "timeout");
+            final FlightConfirmation flightConfirm = new FlightConfirmation(false, "Couldn't reserve a flight, experiencing issues with database. Please try again or select a different flight.");
             Timer timer = new Timer();
             AtomicBoolean timeOut = new AtomicBoolean();
             timeOut.set(false);
