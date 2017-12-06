@@ -5,39 +5,21 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.zinternaltools.DateTimeChangeEvent;
 import dao.DaoFlight;
-import dao.ServerInterface;
 import flight.Flight;
 import flight.FlightConfirmation;
 import flight.Flights;
 import flight.ReserveFlight;
 import flightsystem.TableItems.FlightNumber;
-import java.awt.Component;
-import java.awt.ItemSelectable;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
-import static java.util.Collections.list;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JCheckBox;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 
 /**
  * UI class that's responsible for displaying and handling button presses,
@@ -65,26 +47,18 @@ public class FlightSystemUI extends javax.swing.JFrame {
         initComponents();
         flightInfoController = new FlightInfoController();
         returnDateTimePicker.setEnabled(false);
-        reserveButton.setEnabled(true); //change back
+        reserveButton.setEnabled(true); 
         arrivalTable.setEnabled(false);
         departureComboBox.removeAllItems();
         arrivalComboBox.removeAllItems();
-        getAirports();
-        //departureDateTimePicker.setDateTimeStrict(LocalDateTime.of(2017, Month.DECEMBER, 6, 0, 0));
-        //returnDateTimePicker.setDateTimeStrict(LocalDateTime.of(2017, Month.DECEMBER, 6, 0, 0));
-        MultiLineTableCellRenderer renderer = new MultiLineTableCellRenderer();
-
-    //set TableCellRenderer into a specified JTable column class
-        departureTable.setDefaultRenderer(String[].class, renderer);
-        
-        //DateTimePicker Listeners that set local time whenever user picks a 
+        getAirports(); //need to get airports for airport combo boxes
+       
+        //DateTimePicker Listeners that set local time whenever user picks a time
         departureDateTimePicker.addDateTimeChangeListener((DateTimeChangeEvent dtce) -> {
             departureLocalDateTime = departureDateTimePicker.getDateTimeStrict();
-            //flightSystemUILogger.log(Level.INFO, "Departure Time: {0}", departureLocalDateTime.toString());
         });
         returnDateTimePicker.addDateTimeChangeListener((DateTimeChangeEvent dtce) -> {
            returnLocalDateTime = returnDateTimePicker.getDateTimeStrict();
-           //flightSystemUILogger.log(Level.INFO, "Return Time: {0}", returnLocalDateTime.toString());
         });
 
     }
@@ -104,8 +78,10 @@ public class FlightSystemUI extends javax.swing.JFrame {
     }
     /**
      * Add airport to the comboBox(drop down of airports)
-     * @param code: 3 letter airport code
-     * @param airport: full name of the airport
+     * @param code
+     *        3 letter airport code
+     * @param airport
+     *      full name of the airport
      */
     private void addAiportToComboBoxes( String code, String airport)
     {
@@ -448,6 +424,11 @@ public class FlightSystemUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
    
     
+    /**
+     * Checks to make sure departure and arrival airports are not the same
+     * @return 
+     *    String with error message or empty string
+     */
     private String checkAirports()
     {
         flightSystemUILogger.log(Level.INFO,"checkAirport");
@@ -461,8 +442,9 @@ public class FlightSystemUI extends javax.swing.JFrame {
         }
     }
     /**
-     * 
+     * Check to make sure seat type is selected by the user
      * @return 
+     *    String with error message or empty string
      */
     private String checkSeatingSelection()
     {
@@ -475,6 +457,11 @@ public class FlightSystemUI extends javax.swing.JFrame {
             return "";
         }
     }
+    /**
+     * Check to make sure date and times are selected
+     * @return 
+     *     String with error message or empty string
+     */
     private String checkDateTimeDeparture()
     {
         if (departureLocalDateTime != null)
@@ -520,28 +507,24 @@ public class FlightSystemUI extends javax.swing.JFrame {
     }
     /**
      * Search for flight when search button is pressed
+     * Checks if all of necessary components have been selected/checked
      * @param evt 
      */
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
         
         
         flightSystemUILogger.log(Level.INFO, "Search button pressed, checking for issues");
-        List<String> listOfError = new ArrayList<String>();
+        List<String> listOfError = new ArrayList<>();
         addError errorLambda = (str) -> {
             if(!str.isEmpty())
             {
                 listOfError.add(str);
             }
         };
-        //addError s = (str) -> if(str != ""){listOfError.add(str)};
         
-        errorLambda.check(checkAirports() );
+        errorLambda.check(checkAirports());
         errorLambda.check(checkDateTimeDeparture());
         errorLambda.check(checkSeatingSelection());
-        if (roundtripCheckBox.isSelected())
-        {
-            //checkDateTimeReturn()
-        }
         if (listOfError.isEmpty())
         {
             flightSystemUILogger.log(Level.INFO, "Everything ok, searching for flights");
@@ -552,7 +535,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
             {
                 getDirectFlights();
             }
-            else
+            else //Get layover flights from departure -> arrival airport
             {
                 getLayOverFlights();
             }
@@ -561,7 +544,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
         }
         else
         {
-            String errorMessage="";
+            String errorMessage=""; //to display to user if anything is not selected
             for ( String error: listOfError )
             {
                 errorMessage = errorMessage +"\n" +error;
@@ -573,6 +556,10 @@ public class FlightSystemUI extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_searchButtonActionPerformed
+    
+    /**
+     * 
+     */
     private void getDirectFlights()
     {
         //Flights depFlights = ServerInterface.INSTANCE.getFlights("CS509team1", departureCode, localTime, ServerInterface.QueryFlightType.DEPART, getFilter(arrivalCode));
@@ -629,6 +616,9 @@ public class FlightSystemUI extends javax.swing.JFrame {
             flightInfoController.searchDirectFlight(arrivalCode, returnLocalDateTime, departureCode, seatTypes, arrivalReceiver);
         }
     }
+    /**
+     * Get the layover flight passing parameters to Controller 
+     */
     private void getLayOverFlights()
     {
         FlightInfoController.StopoverFlightsReceiver receiver = (List<List<Flight>> depFlights) -> {
@@ -655,7 +645,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
         List<String> seatTypes = seatList.getSelectedValuesList();
         int layover = Integer.parseInt( layoverComboxBox.getSelectedItem().toString());
         flightInfoController.searchStopoverFlights(departureCode, departureLocalDateTime, arrivalCode, seatTypes, layover, receiver);
-        if (roundtripCheckBox.isSelected())
+        if (roundtripCheckBox.isSelected()) //get return flights with layover
         {
             flightSystemUILogger.log(Level.INFO,"Getting return flights");
             FlightInfoController.StopoverFlightsReceiver returnFlightsReceiver = (List<List<Flight>> depFlights) -> {
@@ -681,15 +671,24 @@ public class FlightSystemUI extends javax.swing.JFrame {
         searchButton.setEnabled(false);
         reserveButton.setEnabled(false);
     }
+    /**
+     * Retrieve information from Flights and display them in the appropriate table
+     * This function is used for layover flights
+     * @param flights
+     *        List of list of flights for Flights with layovers
+     * @param table 
+     *      departure or return table
+     */
     private void addFlightToTable(List<List<Flight>> flights, javax.swing.JTable table)
     {
         DefaultTableModel model = new DefaultTableModel();
+        //go through each flight and add them one row at a time
         for (List<Flight> flightsForLeg : flights) {
             int flightTime = 0;
             List<String> seatTypes = new ArrayList<>();
             double totalPrice = 0.0;
             TableItems tableItems = new TableItems();
-            int numberOfLayovers = flightsForLeg.size() - 1;
+            int numberOfLayovers = flightsForLeg.size() - 1; //2 flight object represent a single layover
             for (Flight f : flightsForLeg) {
                 tableItems.flightNumberClass.addFlightNumber(f.getmNumber());
                 tableItems.departureArrivalTimeClass.addDepartureArrivalTime(f.getmDepTime(), f.getmArrTime() );
@@ -709,28 +708,38 @@ public class FlightSystemUI extends javax.swing.JFrame {
                 }
 
             }
-
+            //Set column names
             model.setColumnIdentifiers(new String[]{
                 "Flight #(s)", 
                 "Departure->Arrival(Airports)", 
                 "Departure->Arrival(Times)", 
                 "Layover Time(s)(Minutes)", 
-                "Total Flight Time", 
-                "Total Price", 
+                "Total Flight Time(Minutes)", 
+                "Total Price($)", 
                 "# of Layovers"
             });
+            //Add each row to model
             model.addRow(new Object[]{
                 tableItems.flightNumberClass,
                 tableItems.departureArrivalClass,
                 tableItems.departureArrivalTimeClass,
                 tableItems.departureArrivalTimeClass.getLayOverTimes(),
                 flightTime,
-                totalPrice,
+                String.format("%.2f", totalPrice),
                 numberOfLayovers
             });
+            //add the content to the table
             table.setModel(model);
         }
     }
+    /**
+     * Retrieve information from Flights and display them in the appropriate table
+     * This function is used for layover flights
+     * @param flights
+     *        List of list of flights for Flights with layovers
+     * @param table 
+     *      departure or return table
+     */
     private void addFlightToTable(Flights flights, javax.swing.JTable table)
     {
             DefaultTableModel model = new DefaultTableModel();
@@ -740,8 +749,8 @@ public class FlightSystemUI extends javax.swing.JFrame {
                 "Departure->Arrival(Airports)", 
                 "Departure->Arrival(Times)", 
                 "Layover Time(s)(Minutes)", 
-                "Total Flight Time", 
-                "Total Price",  
+                "Total Flight Time(Minutes)", 
+                "Total Price($)", 
                 "# of Layovers"
             });
             flights.forEach((f) -> {
@@ -773,14 +782,24 @@ public class FlightSystemUI extends javax.swing.JFrame {
                 });
             table.setModel(model);
     }
+    /**
+     * Handle roundtrip check box events
+     * Enables return date time picker for return flight
+     * @param evt 
+     */
     private void roundtripCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roundtripCheckBoxActionPerformed
-        // TODO add your handling code here:
         arrivalTable.setEnabled(roundtripCheckBox.isSelected());
         returnDateTimePicker.setEnabled(roundtripCheckBox.isSelected());
     }//GEN-LAST:event_roundtripCheckBoxActionPerformed
-
+    /**
+     * Handle Reserver button action when pressed
+     * Checks if a row is selected departure and/or return table
+     * Displays messages when reservation was successful or failed
+     * @param evt 
+     */
     private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
-
+        
+        //receiver to handle events when flight reservation is processed
         FlightInfoController.FlightConfirmationReceiver receiver = (FlightConfirmation flightConfirmation) -> {
             if (flightConfirmation.getConfirmed() )
             {
@@ -799,15 +818,17 @@ public class FlightSystemUI extends javax.swing.JFrame {
                 JOptionPane.WARNING_MESSAGE);
             }
         };
-        ReserveFlight flightReser = new ReserveFlight();
-        int[] departureRowIndex = departureTable.getSelectedRows();
+        ReserveFlight flightReservationObj = new ReserveFlight();
        
-        if (departureRowIndex.length == 1)
+        
+        int[] departureRowIndex = departureTable.getSelectedRows();
+        
+        if (departureRowIndex.length == 1) //check to see if deparure row was selected
         {
             int rowIndex = departureRowIndex[0];
             int column = departureTable.getColumnModel().getColumnIndex("Flight #(s)");
             FlightNumber flightNumberObj = (FlightNumber)departureTable.getModel().getValueAt(rowIndex, column);
-            if( flightNumberObj == null)
+            if( flightNumberObj == null) //making sure we have data in the table
             {
                  JOptionPane.showMessageDialog(null,
                     "Flight selected is invalid. Make sure the table is not empty!",
@@ -815,10 +836,11 @@ public class FlightSystemUI extends javax.swing.JFrame {
                     JOptionPane.WARNING_MESSAGE);
                     return;
             }
+            
             flightNumberObj.getFlightNumberAndSeatType().entrySet().forEach((entry) -> {
-                flightReser.addSeat(entry.getKey(), entry.getValue());
-            });
-            if( roundtripCheckBox.isSelected() )
+                flightReservationObj.addSeat(entry.getKey(), entry.getValue());
+            }); //get flights numbers and seats associated with them and add them to reservation object
+            if( roundtripCheckBox.isSelected() ) 
             {
                 
                 int[] arrivalRowIndex = arrivalTable.getSelectedRows();
@@ -834,10 +856,10 @@ public class FlightSystemUI extends javax.swing.JFrame {
                         return;
                     }
                     returnNumberObj.getFlightNumberAndSeatType().entrySet().forEach((entry) -> {
-                    flightReser.addSeat(entry.getKey(), entry.getValue()); });
+                    flightReservationObj.addSeat(entry.getKey(), entry.getValue()); });
                     if ( askForConfirmation() == 0)
                     {
-                        flightInfoController.reserveFlight(flightReser, receiver);
+                        flightInfoController.reserveFlight(flightReservationObj, receiver);
                     }
                 }
                 else
@@ -846,14 +868,13 @@ public class FlightSystemUI extends javax.swing.JFrame {
                     "Please select a flight from Return Table",
                     "Reservation Error",
                     JOptionPane.WARNING_MESSAGE);
-                    return;
                 }
             }
             else
             {
                 if ( askForConfirmation() == 0)
                 {
-                    flightInfoController.reserveFlight(flightReser, receiver);
+                    flightInfoController.reserveFlight(flightReservationObj, receiver);
                 }
             }
             
@@ -864,7 +885,6 @@ public class FlightSystemUI extends javax.swing.JFrame {
             "Too many flights selected in Departure Table",
             "Reservation Error",
             JOptionPane.WARNING_MESSAGE);
-            return;
         }
         else
         {
@@ -872,12 +892,12 @@ public class FlightSystemUI extends javax.swing.JFrame {
             "Please select a flight from Departure Table",
             "Reservation Error",
             JOptionPane.WARNING_MESSAGE);
-            return;
         }
     }//GEN-LAST:event_reserveButtonActionPerformed
     /**
      * Ask user to confirm or cancel selection for reservation
-     * @return 0=confirm, 1=cancel
+     * @return 
+     *     integer 0=confirm, 1=cancel
      */
     private int askForConfirmation()
     {
@@ -892,39 +912,7 @@ public class FlightSystemUI extends javax.swing.JFrame {
         options[0]); 
         return response;
     }
-    
-    /**
-    * Filter that's used to filter out arrival flights 
-    * @param code
-    * @return QueryFilter
-    */
-    private ServerInterface.QueryFlightFilter getFilter(String code)
-    {
-        ServerInterface.QueryFlightFilter flightFilter = (Flight f) -> {
-            return f.getmArrAirport() != null && f.getmArrAirport().equals(code);
-        };
-        return flightFilter;
-    }
-    
-    public class MultiLineTableCellRenderer extends JList<String> implements TableCellRenderer {
-
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        //make multi line where the cell value is String[]
-        if (value instanceof String[]) {
-            setListData((String[]) value);
-        }
-
-        //cell backgroud color when selected
-        if (isSelected) {
-            setBackground(UIManager.getColor("Table.selectionBackground"));
-        } else {
-            setBackground(UIManager.getColor("Table.background"));
-        }
-
-        return this;
-    }
-}
+ 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<ComboItem> arrivalComboBox;
