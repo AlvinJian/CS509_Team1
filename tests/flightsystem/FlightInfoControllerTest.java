@@ -5,6 +5,7 @@
  */
 package flightsystem;
 
+import airport.Airport;
 import airport.Airports;
 import flight.FlightConfirmation;
 import flight.ReserveFlight;
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
 import flight.Flight;
 import flight.ReserveFlight;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -84,16 +86,16 @@ public class FlightInfoControllerTest {
     /**
      * Test of reserveFlight method, of class FlightInfoController.
      */
-    @Test
-    public void testReserveFlight() {
-        System.out.println("reserveFlight");
-        ReserveFlight reserveFlightObj = null;
-        FlightInfoController.FlightConfirmationReceiver receiver = null;
-        FlightInfoController instance = new FlightInfoController();
-        instance.reserveFlight(reserveFlightObj, receiver);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+//    @Test
+//    public void testReserveFlight() {
+//        System.out.println("reserveFlight");
+//        ReserveFlight reserveFlightObj = null;
+//        FlightInfoController.FlightConfirmationReceiver receiver = null;
+//        FlightInfoController instance = new FlightInfoController();
+//        instance.reserveFlight(reserveFlightObj, receiver);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 
     /**
      * Test of SearchStopoverFlights method, of class FlightInfoController.
@@ -131,9 +133,42 @@ public class FlightInfoControllerTest {
     @Test
     public void testConvertToAirportTime() {
         System.out.println("convertToAirportTime");
-        List<Flight> flights = null;
+//        List<Flight> flights = null;
+        List<Flight> flights = new ArrayList<Flight>();
+        String[] codeAirport = {"BOS", "PHL", "JFK", "SFO", "SEA", "BOS"};
+        for (int i = 0; i < 5; i++){
+            Flight f = new Flight();
+            f.setmDepAirport(codeAirport[i+1]);
+            f.setmDepTime(LocalDateTime.now().plusDays(i));
+            f.setmArrAirport(codeAirport[i]);
+            f.setmArrTime(LocalDateTime.now().plusHours(i));
+            flights.add(f);
+        }
+        
+        for (int i = 0; i < 5; i ++) {
+            System.out.println("-----------------------------");
+            System.out.println(flights.get(i).getmDepAirport());
+            System.out.println(flights.get(i).getmDepTime());
+            System.out.println(flights.get(i).getmArrAirport());
+            System.out.println(flights.get(i).getmArrTime());
+        }
         FlightInfoController instance = new FlightInfoController();
+        System.out.println(instance);
+        Airports airports = instance.syncAirports();
+        System.out.println("airports size="+airports.size());
+            for (Airport a: airports) {
+                System.out.println(a.toString());
+            }
         instance.convertToAirportTime(flights);
+        
+        for (int i = 0; i < 5; i ++) {
+            System.out.println("-----------------------------");
+            System.out.println(flights.get(i).getmDepAirport());
+            System.out.println(flights.get(i).getmDepTime());
+            System.out.println(flights.get(i).getmArrAirport());
+            System.out.println(flights.get(i).getmArrTime());
+        }
+        
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
