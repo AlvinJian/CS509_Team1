@@ -42,30 +42,38 @@ public class TableItemsTest {
 
     @Test
     public void testAddFlightnumberString() {
+        /**
+         * Test to verify toString conversion for flightNumbers
+         */
+        System.out.println("testAddFlightnumberString");
         TableItems tableItems = new TableItems();
         tableItems.flightNumberClass.addFlightNumber("503");
         tableItems.flightNumberClass.addFlightNumber("504");
         String returnString = tableItems.flightNumberClass.toString();
-        assert(returnString.equals("503 504"));
+        assert(returnString.equals("503->504"));
     }
     @Test
     public void testDepartureArrivalTimeString() {
+        /**
+         * Test to verify departure and arrival airport code toString() method
+         */
+        System.out.println("testDepartureArrivalTimeString");
         TableItems tableItems = new TableItems();
         tableItems.departureArrivalClass.addDepartureArrival("BOS", "CLE", "COACH");
         tableItems.departureArrivalClass.addDepartureArrival("CLE", "GE", "COACH");
         tableItems.departureArrivalClass.addDepartureArrival("GE", "FL", "COACH");
-        String sg = tableItems.departureArrivalClass.toString();
-        //tableItems.departureArrivalTimeClass.addDepartureArrivalTime("5PM", "10PM");
-        //tableItems.departureArrivalTimeClass.addDepartureArrivalTime("11PM", "11:30PM");
-        //String returnString = tableItems.departureArrivalTimeClass.toString();
-        //String expected = "%s hola ", "";
-        //BOS"-["+infoMap.get("seatType")+"]->"+infoMap.get("arrival");
-        assert( true );
+        String resultString = tableItems.departureArrivalClass.toString();
+        String expected ="BOS-[COACH]->CLE-[COACH]->GE-[COACH]->FL";
+        assert( resultString.equals(expected) );
     }
     
     @Test
     public void testLayoverString() 
     {
+        /**
+         * Test to verify departure and arrival time toString()
+         */
+        System.out.println("testDepartureArrivalTimeString");
         TableItems tableItems = new TableItems();
         LocalDateTime departure1 = LocalDateTime.now();
         LocalDateTime arrival1 = LocalDateTime.now().plusHours(1);
@@ -79,8 +87,13 @@ public class TableItemsTest {
         String layoverTimes = tableItems.departureArrivalTimeClass.getLayOverTimes();
         assert( layoverTimes.equals("60,120"));
         
-        String bb = tableItems.departureArrivalTimeClass.toString();
-        assert( true );
+        String resultString = tableItems.departureArrivalTimeClass.toString();
+        String expectedString = departure1.toString()+"->"+arrival1.toString()+
+                "-LAYOVER-"+
+                departure2.toString()+"->"+arrival2.toString()+
+                "-LAYOVER-"+
+                departure3.toString()+"->"+arrival3.toString();
+        assert( resultString.equals(expectedString) );
         
     }
     
