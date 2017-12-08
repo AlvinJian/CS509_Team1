@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import flight.Flight;
+import flight.Flights;
 import flight.ReserveFlight;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -72,18 +73,34 @@ public class FlightInfoControllerTest {
     /**
      * Test of searchDirectFlight method, of class FlightInfoController.
      */
-    @Ignore
     @Test
     public void testSearchDirectFlight() {
         System.out.println("searchDirectFlight");
-        String fromAirportCode = "";
-        LocalDateTime fromTime = null;
-        String toAirportCode = "";
-        FlightInfoController.FlightsReceiver receiver = null;
+        String fromAirportCode = "BOS";
+        LocalDateTime fromTime = LocalDateTime.parse("2017-12-07T08:00");
+        String toAirportCode = "PHL";
         FlightInfoController instance = new FlightInfoController();
-        //instance.searchDirectFlight(fromAirportCode, fromTime, toAirportCode, receiver);
-        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
+        List<String> seatTypes = new ArrayList<>();
+        seatTypes.add(Airplane.FIRST);
+        AtomicBoolean largerThanZero = new AtomicBoolean();
+        largerThanZero.set(false);
+        FlightInfoController.FlightsReceiver receiver = new FlightInfoController.FlightsReceiver() {
+            @Override
+            public void onReceived(Flights ret) {
+                if (ret.size() > 0) {
+                    largerThanZero.set(true);
+                }
+            }
+        };
+        instance.searchDirectFlight(fromAirportCode, fromTime, toAirportCode, seatTypes,receiver);
+        try {
+            Thread.sleep(5000L);
+            if (!largerThanZero.get()) {
+                fail("SearchDirectFlight fails");
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FlightInfoControllerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -108,14 +125,24 @@ public class FlightInfoControllerTest {
     @Test
     public void testSearchStopoverFlights() {
         System.out.println("SearchStopoverFlights");
-        String depAirportCode = "";
-        LocalDateTime depTime = null;
-        String arrAirportCode = "";
-        List<String> seatTypes = null;
-        int stopover = 0;
-        FlightInfoController.StopoverFlightsReceiver receiver = null;
+        String depAirportCode = "BOS";
+        LocalDateTime depTime = LocalDateTime.parse("2017-12-07T08:00");
+        String arrAirportCode = "PHL";
+        List<String> seatTypes = new ArrayList<>();
+        seatTypes.add(Airplane.FIRST);
+        int stopover = 1;
+        FlightInfoController.StopoverFlightsReceiver receiver = new FlightInfoController.StopoverFlightsReceiver() {
+            @Override
+            public void onReceived(List<List<Flight>> ret) {
+                for (List<Flight> flights: ret) {
+                    for (Flight f: flights) {
+                        // TODO need figure out what to do here
+                    }
+                }
+            }
+        };
         FlightInfoController instance = new FlightInfoController();
-        //instance.SearchStopoverFlights(depAirportCode, depTime, arrAirportCode, seatTypes, stopover, receiver);
+        instance.searchStopoverFlights(depAirportCode, depTime, arrAirportCode, seatTypes, stopover, receiver);
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
