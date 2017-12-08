@@ -280,7 +280,7 @@ public class FlightInfoController {
      * @return true if the flight already exists in the previous search, otherwise, return false 
      */
     private boolean isInDfsHistory(List<Flight> list, Flight flight) {
-        Level level = Level.FINE;
+        Level level = Level.INFO;
         controllerLogger.log(level, "===START===");
         StringBuilder builder = new StringBuilder();
         for (Flight f : list) {

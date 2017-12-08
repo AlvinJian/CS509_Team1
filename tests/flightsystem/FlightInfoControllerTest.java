@@ -5,6 +5,7 @@
  */
 package flightsystem;
 
+import airplane.Airplane;
 import airport.Airport;
 import airport.Airports;
 import flight.FlightConfirmation;
@@ -17,6 +18,7 @@ import flight.Flight;
 import flight.ReserveFlight;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -135,49 +137,57 @@ public class FlightInfoControllerTest {
      * Test of convertToAirportTime method, of class FlightInfoController.
      */
     
-    @Test
-    public void testConvertToAirportTime() {
-        System.out.println("convertToAirportTime");
-        FlightInfoController.SwitchServer(null);
-//        List<Flight> flights = null;
-        List<Flight> flights = new ArrayList<Flight>();
-        String[] codeAirport = {"BOS", "PHL", "JFK", "SFO", "SEA", "BOS"};
-        for (int i = 0; i < 5; i++){
-            Flight f = new Flight();
-            f.setmDepAirport(codeAirport[i+1]);
-            f.setmDepTime(LocalDateTime.now().plusDays(i));
-            f.setmArrAirport(codeAirport[i]);
-            f.setmArrTime(LocalDateTime.now().plusHours(i));
-            flights.add(f);
-        }
-        
-        for (int i = 0; i < 5; i ++) {
-            System.out.println("-----------------------------");
-            System.out.println(flights.get(i).getmDepAirport());
-            System.out.println(flights.get(i).getmDepTime());
-            System.out.println(flights.get(i).getmArrAirport());
-            System.out.println(flights.get(i).getmArrTime());
-        }
-        FlightInfoController instance = new FlightInfoController();
-        System.out.println(instance);
-        Airports airports = instance.getAirports();
-        System.out.println("airports size="+airports.size());
-            for (Airport a: airports) {
-                System.out.println(a.toString());
-            }
-        instance.convertToAirportTime(flights);
-        
-        for (int i = 0; i < 5; i ++) {
-            System.out.println("-----------------------------");
-            System.out.println(flights.get(i).getmDepAirport());
-            System.out.println(flights.get(i).getmDepTime());
-            System.out.println(flights.get(i).getmArrAirport());
-            System.out.println(flights.get(i).getmArrTime());
-        }
-        
-        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-    }
+//    @Test
+//    public void testConvertToAirportTime() {
+//        System.out.println("testConvertToAirportTime");
+//        FlightInfoController.SwitchServer(null);
+////        List<Flight> flights = null;
+//        List<Flight> flights = new ArrayList<Flight>();
+//        HashMap<String, int> zoneDiff = { "BOS":-5};
+//        String[] departureAirportCodes = {"BOS", "PHL", "JFK", "SFO"};
+//        String[] arrivalAirportCodes = {"PHL", "BOS", "SFO", "JFK"};
+//        HashMap<String, Flight> gmtTimesDepartureTime =  new HashMap<>();
+//        for (String airportCode: airPortCodes){
+//            Flight flight = new Flight();
+//            
+//            
+//            
+//            flight.setmDepAirport(codeAirport[i+1]);
+//            flight.setmDepTime(LocalDateTime.now().plusDays(i));
+//            
+//            flight.setmArrAirport(codeAirport[i]);
+//            flight.setmArrTime(LocalDateTime.now().plusHours(i));
+//            gmtTimes.put(airportCode,flight);
+//            flights.add(f);
+//        }
+//        
+//        for (int i = 0; i < 5; i ++) {
+//            System.out.println("-----------------------------");
+//            System.out.println(flights.get(i).getmDepAirport());
+//            System.out.println(flights.get(i).getmDepTime());
+//            System.out.println(flights.get(i).getmArrAirport());
+//            System.out.println(flights.get(i).getmArrTime());
+//        }
+//        FlightInfoController instance = new FlightInfoController();
+//        System.out.println(instance);
+//        Airports airports = instance.getAirports();
+//        System.out.println("airports size="+airports.size());
+//            for (Airport a: airports) {
+//                System.out.println(a.toString());
+//            }
+//        instance.convertToAirportTime(flights);
+//        
+//        for (int i = 0; i < 5; i ++) {
+//            System.out.println("-----------------------------");
+//            System.out.println(flights.get(i).getmDepAirport());
+//            System.out.println(flights.get(i).getmDepTime());
+//            System.out.println(flights.get(i).getmArrAirport());
+//            System.out.println(flights.get(i).getmArrTime());
+//        }
+//        
+//        // TODO review the generated test code and remove the default call to fail.
+////        fail("The test case is a prototype.");
+//    }
     
 //    @Test
 //    public void testReserveFlight() {
@@ -208,13 +218,49 @@ public class FlightInfoControllerTest {
         MockServerInterface mockint = new MockServerInterface();
         FlightInfoController.SwitchServer(mockint);
         FlightInfoController flightCtl = new FlightInfoController();
-        
+        Flight flight = new Flight();
+            
         //flightCtl.SwitchServer(mockint);
         //mockint.setAirPort();
         Airports ap = flightCtl.getAirports();
         assert( ap.size() > 0 );
         Airport ar = ap.get(0);
         assert("BOS".equals(ar.code()));
+    }
+
+    @Test
+    public void testGetOneLayoverFlight() {
+        int timeOut = 3000;
+        System.out.println("testGetOneLayoverFlight");
+        MockServerInterface mockint = new MockServerInterface();
+        FlightInfoController flightCtl = new FlightInfoController();
+        flightCtl.getAirports();
+        FlightInfoController.SwitchServer(mockint);
+        mockint.setAirplane(new Airplane("Boeing", "747", 100, 100));
+        Flight bosToPhi= new Flight("747", 1, "6565","BOS", LocalDateTime.now(),"PHL", LocalDateTime.now().plusHours(1), 50.60, 20, 25.30, 10);
+        Flight phiToFl= new Flight("747", 1, "6566","PHL", LocalDateTime.now().plusHours(2),"FLL", LocalDateTime.now().plusHours(3), 50.60, 20, 25.30,10);
+        mockint.setFlight(bosToPhi);
+        mockint.setFlight(phiToFl);
+        AtomicBoolean flightsFound = new AtomicBoolean();
+        flightsFound.set(false);
+        FlightInfoController.StopoverFlightsReceiver receiver = (List<List<Flight>> ret) -> {
+            if (ret.size() > 0) {
+                if (ret.get(0).size() == 2)
+                {
+                    flightsFound.set(true);
+                }
+            }
+        };
+        flightCtl.searchStopoverFlights("BOS", LocalDateTime.now().minusHours(1), "FLL", new ArrayList<String>(){{add("Coach");}}, 1, receiver);
+        try {
+             Thread.sleep(timeOut);
+             if (!flightsFound.get()) {
+                 fail("testGetOneLayoverFlight failed. Did not get 2 flights.");
+             }
+         } catch (InterruptedException ex) {
+             Logger.getLogger(FlightInfoControllerTest.class.getName()).log(Level.SEVERE, null, ex);
+             fail("Did not receive a response from FlightController within " + timeOut);
+         }
 
     }
 }
