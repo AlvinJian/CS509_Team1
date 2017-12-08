@@ -20,6 +20,7 @@ import utils.QueryFactory;
 import flight.Flights;
 import flight.ReserveFlight;
 import java.time.LocalDateTime;
+import utils.Server;
 
 
 /**
@@ -31,7 +32,7 @@ import java.time.LocalDateTime;
  * @since 2016-02-24
  *
  */
-public enum ServerInterface {
+public enum ServerInterface implements Server{
 	INSTANCE;
 	
 	private final String mUrlBase = "http://cs509.cs.wpi.edu:8181/CS509.server/ReservationSystem";

@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import utils.Server;
 
 /**
  * Controller class standing between UI and server interface
@@ -39,13 +40,13 @@ import javax.swing.SwingUtilities;
 public class FlightInfoController {
 
     private static final Object serverLck = new Object();
-    private static ServerInterface serverInstance;
+    private static Server serverInstance;
     
     /**
      * Switch controller's server backend to another
      * @param server 
      */
-    public static void SwitchServer(ServerInterface server) {
+    public static void SwitchServer(Server server) {
         serverInstance = server;
     }
     
@@ -63,7 +64,10 @@ public class FlightInfoController {
     private Map<String, Airplane> airplaneCache;
 
     public FlightInfoController() {
-        serverInstance = ServerInterface.INSTANCE;
+        if ( serverInstance == null )
+        {
+            serverInstance = ServerInterface.INSTANCE;
+        }
         getAirplanes();
     }
 

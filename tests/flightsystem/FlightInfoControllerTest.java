@@ -5,6 +5,7 @@
  */
 package flightsystem;
 
+import airport.Airport;
 import airport.Airports;
 import flight.FlightConfirmation;
 import flight.ReserveFlight;
@@ -23,6 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
+import utils.MockServerInterface;
 
 /**
  *
@@ -84,6 +86,7 @@ public class FlightInfoControllerTest {
     /**
      * Test of reserveFlight method, of class FlightInfoController.
      */
+    @Ignore
     @Test
     public void testReserveFlight() {
         System.out.println("reserveFlight");
@@ -98,6 +101,7 @@ public class FlightInfoControllerTest {
     /**
      * Test of SearchStopoverFlights method, of class FlightInfoController.
      */
+    @Ignore
     @Test
     public void testSearchStopoverFlights() {
         System.out.println("SearchStopoverFlights");
@@ -116,6 +120,7 @@ public class FlightInfoControllerTest {
     /**
      * Test of syncAirplanes method, of class FlightInfoController.
      */
+    @Ignore
     @Test
     public void testSyncAirplanes() {
         System.out.println("syncAirplanes");
@@ -128,6 +133,7 @@ public class FlightInfoControllerTest {
     /**
      * Test of convertToAirportTime method, of class FlightInfoController.
      */
+    @Ignore
     @Test
     public void testConvertToAirportTime() {
         System.out.println("convertToAirportTime");
@@ -160,4 +166,20 @@ public class FlightInfoControllerTest {
 //        
 //        fail("The test case is a prototype.");
 //    }
+    @Test
+    public void testGetAirports() {
+        System.out.println("testMockInterface");
+        List<Flight> flights = null;
+        MockServerInterface mockint = new MockServerInterface();
+        FlightInfoController.SwitchServer(mockint);
+        FlightInfoController flightCtl = new FlightInfoController();
+        
+        //flightCtl.SwitchServer(mockint);
+        //mockint.setAirPort();
+        Airports ap = flightCtl.getAirports();
+        assert( ap.size() > 0 );
+        Airport ar = ap.get(0);
+        assert("BOS".equals(ar.code()));
+
+    }
 }

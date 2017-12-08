@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -56,8 +58,11 @@ public class TableItemsTest {
         //tableItems.departureArrivalTimeClass.addDepartureArrivalTime("5PM", "10PM");
         //tableItems.departureArrivalTimeClass.addDepartureArrivalTime("11PM", "11:30PM");
         //String returnString = tableItems.departureArrivalTimeClass.toString();
+        //String expected = "%s hola ", "";
+        //BOS"-["+infoMap.get("seatType")+"]->"+infoMap.get("arrival");
         assert( true );
     }
+    
     @Test
     public void testLayoverString() 
     {
