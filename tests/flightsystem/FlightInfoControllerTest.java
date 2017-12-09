@@ -294,4 +294,49 @@ public class FlightInfoControllerTest {
          }
 
     }
+    
+    @Test
+    public void testGetTwoLayoverFlight() {
+        int timeOut = 3000;
+        System.out.println("testGetOneLayoverFlight");
+        MockServerInterface mockint = new MockServerInterface();
+        FlightInfoController flightCtl = new FlightInfoController();
+        FlightInfoController.SwitchServer(ServerInterface.INSTANCE);
+        flightCtl.getAirports();
+        flightCtl.getAirplanes();
+        FlightInfoController.SwitchServer(mockint);
+        mockint.setAirplane(new Airplane("Boeing", "747", 100, 100));
+        Flight bosToPhi = new Flight("747", 1, "6565", "BOS", LocalDateTime.now(), "PHL", LocalDateTime.now().plusHours(1), 50.60, 20, 25.30, 10);
+        Flight phiToFl = new Flight("747", 1, "6566", "PHL", LocalDateTime.now().plusHours(2), "FLL", LocalDateTime.now().plusHours(3), 50.60, 20, 25.30, 10);
+        Flight flToCLE = new Flight("747", 1, "6567", "FLL", LocalDateTime.now().plusHours(3), "CLE", LocalDateTime.now().plusHours(4), 50.60, 20, 25.30, 10);
+        mockint.setFlight(bosToPhi);
+        mockint.setFlight(phiToFl);
+        mockint.setFlight(flToCLE);
+        AtomicBoolean flightsFound = new AtomicBoolean();
+        flightsFound.set(false);
+        FlightInfoController.StopoverFlightsReceiver receiver = (List<List<Flight>> ret) -> {
+            if (ret.size() > 0) {
+                if (ret.get(0).size() == 3) {
+                    flightsFound.set(true);
+                }
+            }
+        };
+        flightCtl.searchStopoverFlights("BOS", LocalDateTime.now().minusHours(1), "CLE", new ArrayList<String>() {
+            {
+                add("Coach");
+            }
+        }, 2, receiver);
+        try {
+            Thread.sleep(timeOut);
+            if (!flightsFound.get()) {
+                fail("testGetOneLayoverFlight failed. Did not get 2 flights.");
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FlightInfoControllerTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail("Did not receive a response from FlightController within " + timeOut);
+        }
+
+    }
 }
+
+
