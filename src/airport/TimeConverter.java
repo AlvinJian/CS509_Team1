@@ -10,7 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
- *
+ * helper class for converting local date time
  * @author alvin
  */
 public class TimeConverter {

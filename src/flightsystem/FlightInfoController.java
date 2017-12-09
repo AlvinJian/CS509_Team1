@@ -34,7 +34,8 @@ import javax.swing.SwingUtilities;
 import utils.Server;
 
 /**
- * Controller class standing between UI and server interface
+ * Controller class standing between UI and server interface. It implements major 
+ * business logic of this system.
  * @author alvin
  */
 public class FlightInfoController {

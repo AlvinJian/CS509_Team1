@@ -22,10 +22,15 @@ import org.json.*;
  */
 // TODO need 3rd APIs to do mapping here!
 public class AirportZoneMap {
-public static ZoneId GetTimeZoneByAiport(Airport airport) {
+    /**
+     * Get ZoneId by specifying airport
+     * @param airport
+     * @return 
+     */
+    public static ZoneId GetTimeZoneByAiport(Airport airport) {
         double lat = airport.latitude();
         double lon = airport.longitude();
-        
+
         String htmlstr = "https://maps.googleapis.com/maps/api/timezone/"
                 + "json?location="
                 + lat + "," + lon + "&timestamp=1458000000&key="
@@ -34,13 +39,13 @@ public static ZoneId GetTimeZoneByAiport(Airport airport) {
         try {
 //            System.out.println(GetTimeZone.getHTML(htmlstr));
             JSONObject timezoneobj = new JSONObject(getHTML(htmlstr));
-            
+
             String outID = timezoneobj.getString("timeZoneId");
             ZoneId ret = ZoneId.of(outID);
             return ret;
         } catch (InterruptedException | MalformedURLException | JSONException e) {
             return ZoneId.systemDefault();
-        }    
+        }
 
     }
 
@@ -69,5 +74,5 @@ public static ZoneId GetTimeZoneByAiport(Airport airport) {
 
         return result.toString();
     }
-    
+
 }

@@ -93,6 +93,11 @@ public enum ServerInterface implements Server{
 		
 	}
         
+        /**
+         * Get a collection of airplanes from server
+         * @param teamName
+         * @return 
+         */
         public Airplanes getAirplanes(String teamName) {
 
 		URL url;
@@ -145,14 +150,35 @@ public enum ServerInterface implements Server{
         private static final String _DEPART = "departing";
         private static final String _ARRIVAL = "arriving";
         
+        /**
+         * Specify which type is used for searching flight. depart or arrival
+         */
         public enum QueryFlightType {
             DEPART, ARRIVAL
         }
         
+        /**
+         * Filter used to determine whether a flight object should be kept in 
+         * the return value getFlight.
+         */
         public interface QueryFlightFilter {
+            /**
+             * if this function return true, f will be kept.
+             * @param f. A flight object retrieved from server.
+             * @return 
+             */
             public boolean isValid(Flight f);
         }
         
+        /**
+         * Get filtered flights from server
+         * @param teamName
+         * @param type
+         * @param airportCode
+         * @param gmtDateTime
+         * @param filter
+         * @return 
+         */
         public Flights getFlights(String teamName, QueryFlightType type, String airportCode, LocalDateTime gmtDateTime, QueryFlightFilter filter) {
             URL url;
             HttpURLConnection connection;
@@ -325,7 +351,12 @@ public enum ServerInterface implements Server{
 		return true;
 	}
         
-        
+        /**
+         * Reserve seat using flight number and seat type
+         * @param teamName
+         * @param reserveFlightObj specifying flight number and seat type
+         * @return 
+         */
         public boolean reserveSeat(String teamName, ReserveFlight reserveFlightObj) {
             URL url;
             HttpURLConnection connection;

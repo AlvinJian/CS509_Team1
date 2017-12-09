@@ -6,7 +6,7 @@
 package flight;
 
 /**
- *
+ * A class indicating whether flight reservation succeed and error message
  * @author dg71532
  */
 public class FlightConfirmation {

@@ -2,15 +2,19 @@ package airplane;
 
 import java.util.Comparator;
 
+/**
+ * Airplane class describing airplane model, manufacturer and seat capacity
+ * @author alvin
+ */
 public class Airplane implements Comparable<Airplane>, Comparator<Airplane> {
     
     public static String COACH = "Coach";
     public static String FIRST = "FirstClass";
     
-	private String mManufacturer; // Full name of the airport
-	private String mModel; // Three character code of the airport
-	private int mFirstClassSeats; // Latitude of airport in decimal format
-	private int mCoachSeats; // Longitude of the airport in decimal format
+	private String mManufacturer;
+	private String mModel; // airplane model name
+	private int mFirstClassSeats; // seat capacity of first class
+	private int mCoachSeats; // seat capacity of coach class
 
 	public Airplane() {
 		mManufacturer = "";

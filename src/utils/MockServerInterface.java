@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 
 /**
- *
+ * Mock server for testing
  * @author dg71532
  */
 public class MockServerInterface implements Server {

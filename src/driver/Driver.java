@@ -16,10 +16,7 @@ public class Driver {
     }
 
 	/**
-	 * Entry point for CS509 sample code driver
-	 * 
-	 * This driver is the main of the application
-	 * It is responsible for launching UI
+         * Main entry of application
 	 * @param args is the arguments passed to java vm in format of "CS509.sample teamName" where teamName is a valid team
 	 */
 	public static void main(String[] args) {
@@ -39,8 +36,6 @@ public class Driver {
             } catch (javax.swing.UnsupportedLookAndFeelException ex) {
                 java.util.logging.Logger.getLogger(FlightSystemUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             }
-        //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
             java.awt.EventQueue.invokeLater(new Runnable() {

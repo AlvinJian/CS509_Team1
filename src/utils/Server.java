@@ -13,7 +13,7 @@ import flight.ReserveFlight;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Mock server and the actual server implement this interface.
  * @author dg71532
  */
 public interface Server {

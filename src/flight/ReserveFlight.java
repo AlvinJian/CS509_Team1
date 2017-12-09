@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- *
+ * A class used for reserving flight on server
  * @author yuey
  */
 public class ReserveFlight {
