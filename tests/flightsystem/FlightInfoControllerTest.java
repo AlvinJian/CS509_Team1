@@ -8,6 +8,7 @@ package flightsystem;
 import airplane.Airplane;
 import airport.Airport;
 import airport.Airports;
+import dao.ServerInterface;
 import flight.FlightConfirmation;
 import flight.ReserveFlight;
 import java.time.LocalDateTime;
@@ -73,6 +74,7 @@ public class FlightInfoControllerTest {
     /**
      * Test of searchDirectFlight method, of class FlightInfoController.
      */
+    @Ignore
     @Test
     public void testSearchDirectFlight() {
         System.out.println("searchDirectFlight");
@@ -261,7 +263,9 @@ public class FlightInfoControllerTest {
         System.out.println("testGetOneLayoverFlight");
         MockServerInterface mockint = new MockServerInterface();
         FlightInfoController flightCtl = new FlightInfoController();
+        FlightInfoController.SwitchServer(ServerInterface.INSTANCE);
         flightCtl.getAirports();
+        flightCtl.getAirplanes();
         FlightInfoController.SwitchServer(mockint);
         mockint.setAirplane(new Airplane("Boeing", "747", 100, 100));
         Flight bosToPhi= new Flight("747", 1, "6565","BOS", LocalDateTime.now(),"PHL", LocalDateTime.now().plusHours(1), 50.60, 20, 25.30, 10);
